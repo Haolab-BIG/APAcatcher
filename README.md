@@ -16,6 +16,18 @@ tqdm==4.66.5
 ```bash
 python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir -p 8
 ```
+Example of Input
+```bash
+chr1    70009   0       OR4F5%%1        +
+chr1    70010   0       OR4F5%%1        +
+chr1    70011   0       OR4F5%%1        +
+chr1    70012   0       OR4F5%%1        +
+chr1    70013   0       OR4F5%%1        +
+chr1    70014   0       OR4F5%%1        +
+chr1    70015   0       OR4F5%%1        +
+chr1    70016   0       OR4F5%%1        +
+...
+```
 ### 2.get high confidence APA sites
 The options for running APAcatcher for PAS identification
 ```bash
@@ -45,6 +57,17 @@ python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_fold
 #2.4 Remove sites located within 100 bp of annotated sites.
 python process_last.py --input_file s_site.bed --output_file final_site_for_quantification.bed
 
+```
+Example of high confidence APA sites bed file
+```bash
+#chr    #start    #end     #cluster size         #gene%%transcript     #strand
+chr1    944201    944201    4                     NOC2L%%1              -
+chr1    965721    965721    2                     KLHL17%%1             +
+chr1    1014542   1014542   2                     ISG15%%1              +
+chr1    1056118   1056118   2                     AGRN%%1               +
+chr1    1081822   1081822   2                     C1orf159%%1           -
+chr1    1216930   1216930   2                     SDF4%%1               -
+...
 ```
 ### 3.using salmon to quantification
 
