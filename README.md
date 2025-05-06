@@ -57,7 +57,7 @@ python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_fold
 ./combind.sh high_confidence_pas_folder high_confidence_pas_folder
 
 #2.4 Remove sites located within 100 bp of annotated sites.
-python process_last.py --input_file s_site.bed --output_file final_site_for_quantification.bed
+python process_last.py --input_file pas_site.bed --output_file final_site_for_quantification.bed
 
 ```
 Example of high confidence APA sites bed file
