@@ -87,4 +87,10 @@ chr1    1216930   1216930   2                     SDF4%%1               -
 ```bash
 python get_final_result.py --group_files group_A.txt group_B.txt ... --merge_file final_quant_result.txt --output_dir final_result 
 ```
-
+Example of 3UTR_index file
+```bash
+#Name                                   Length  Transcript      start           end           strand    sample1_indexUTR        sample2_indexUTR          sample3_indexUTR
+AACS%%3:+::chr12:125142091-125142380    289     AACS%%3         125142091       125142380     +         0.6331098039907349      0.8141000731552296        0.6945178987151257
+AAMP%%1:-::chr2:218264128-218264608     480     AAMP%%1         218264128       218264608     -         0.9140432121116838      0.9762385375962184      0.9821115355165274
+...
+```
