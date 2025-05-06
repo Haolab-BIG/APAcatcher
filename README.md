@@ -1,5 +1,7 @@
 # APAcatcher
+
 ## Install APAcatcher
+We recommend to creat a conda enviroment firstly using conda create -n apacatcher_env python=3.8 and then conda activate apacatcher_env
 Running APAcatcher requires the following packages be installed
 ```bash
 python==3.8.18
