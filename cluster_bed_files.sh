@@ -1,97 +1,240 @@
 #!/bin/bash
 
 # ====================================================
-# Script Name: cluster_bed_files.sh
-# Description : Batch process multiple .bed files: sort, merge, filter,
-#               generate a consolidated final_site.bed file, and clean up intermediate files.
-# Usage       : ./cluster_bed_files.sh <BED_FILES_DIR> <OUTPUT_DIR>
-# Example     : ./cluster_bed_files.sh /data/bed_files /data/results
+# SCRIPT: cluster_bed_files.sh
+# DESCRIPTION: Batch process BED files through sorting, merging,
+#              filtering, and generate final_site.bed
+# USAGE: ./cluster_bed_files.sh [OPTIONS] -i INPUT_DIR -o OUTPUT_DIR
 # ====================================================
 
-# Exit immediately on error
-set -e
+set -eo pipefail
 
-# Check for required input arguments
-if [ $# -lt 2 ]; then
-    echo "Error: Missing arguments."
-    echo "Usage: $0 <BED_FILES_DIRECTORY> <OUTPUT_DIRECTORY>"
-    echo "       <BED_FILES_DIRECTORY>: Path to folder containing .bed files"
-    echo "       <OUTPUT_DIRECTORY>   : Path to folder where results will be saved"
-    exit 1
-fi
+# Configuration
+DEFAULT_MERGE_DISTANCE=70
+MIN_REPLICATE_COUNT=2  
+TEMP_FILES=()
+SCRIPT_NAME=$(basename "$0")
+VERSION="1.0.0"
 
-# Assign input parameters\ nBED_DIR="$1"
-OUTPUT_DIR="$2"
+# Initialize parameters
+INPUT_DIR=""
+OUTPUT_DIR=""
+KEEP_TEMP=false
+THREADS=4
 
-# Change to BED files directory
-cd "$BED_DIR" || { echo "Error: Cannot change to directory '$BED_DIR'"; exit 1; }
+# Cleanup handler
+cleanup() {
+    if [[ "$KEEP_TEMP" == false ]]; then
+        for file in "${TEMP_FILES[@]}"; do
+            if [[ -f "$file" ]]; then
+                rm -f "$file"
+            fi
+        done
+    fi
+}
 
-# Create output directory if it doesn't exist
-mkdir -p "$OUTPUT_DIR"
+trap cleanup EXIT
 
-echo "Starting batch processing of .bed files in: $BED_DIR"
+# Display help information
+show_usage() {
+    cat <<EOF
+${SCRIPT_NAME} v${VERSION} - BED Processing Pipeline
 
-# Array to hold intermediate "keeplast" file paths
-keeplast_files=()
+USAGE:
+    ${SCRIPT_NAME} [OPTIONS] -i INPUT_DIR -o OUTPUT_DIR
 
-echo "Step 1: Processing individual .bed files..."
-for bed_file in *.bed; do
-    # Skip already-processed files
-    if [[ "$bed_file" == *_selfcluster_keeplast.bed ]]; then
-        continue
+MANDATORY ARGUMENTS:
+    -i, --input-dir      Directory containing input BED files
+    -o, --output-dir     Output directory for results
+
+OPTIONS:
+    -d, --merge-dist     Merging distance (default: ${DEFAULT_MERGE_DISTANCE})
+    -c, --min-count      Minimum replicate count (default: ${MIN_REPLICATE_COUNT})
+    -t, --threads        Processing threads (default: ${THREADS})
+    -k, --keep-temp      Keep intermediate files
+    -h, --help           Show this help message
+    -v, --version        Display version
+
+EXAMPLES:
+    Basic usage:
+    ${SCRIPT_NAME} -i ./bed_files -o ./results
+
+    Custom parameters:
+    ${SCRIPT_NAME} -i /data/bed -o /output \\
+                   -d 100 -c 3 -t 8 --keep-temp
+EOF
+}
+
+# Parse command-line arguments
+parse_arguments() {
+    while [[ "$#" -gt 0 ]]; do
+        case $1 in
+            -i|--input-dir)
+                INPUT_DIR="$2"
+                shift
+                ;;
+            -o|--output-dir)
+                OUTPUT_DIR="$2"
+                shift
+                ;;
+            -d|--merge-dist)
+                DEFAULT_MERGE_DISTANCE="$2"
+                shift
+                ;;
+            -c|--min-count)
+                MIN_REPLICATE_COUNT="$2"
+                shift
+                ;;
+            -t|--threads)
+                THREADS="$2"
+                shift
+                ;;
+            -k|--keep-temp)
+                KEEP_TEMP=true
+                ;;
+            -h|--help)
+                show_usage
+                exit 0
+                ;;
+            -v|--version)
+                echo "${SCRIPT_NAME} v${VERSION}"
+                exit 0
+                ;;
+            *)
+                echo "Error: Unknown parameter: $1" >&2
+                show_usage >&2
+                exit 1
+                ;;
+        esac
+        shift
+    done
+}
+
+# Validate input parameters
+validate_inputs() {
+    if ! [[ "$MIN_REPLICATE_COUNT" =~ ^[1-9][0-9]*$ ]]; then
+        echo "Error: Invalid min-count value: must be positive integer" >&2
+        exit 1
     fi
 
-    # Verify file exists
-    if [[ ! -f "$bed_file" ]]; then
-        echo "Warning: No .bed files found in directory."
-        break
+    if ! [[ "$DEFAULT_MERGE_DISTANCE" =~ ^[0-9]+$ ]]; then
+        echo "Error: Invalid merge distance: must be non-negative integer" >&2
+        exit 1
     fi
 
-    # Derive sample prefix from filename (e.g., "sample1.bed" -> "sample1")
-    sample_prefix="${bed_file%.*}"
-    echo "Processing: $bed_file"
+    if ! [[ "$THREADS" =~ ^[1-9][0-9]*$ ]]; then
+        echo "Error: Invalid threads: must be positive integer" >&2
+        exit 1
+    fi
 
-    # Define output filename
-    keeplast_file="$OUTPUT_DIR/${sample_prefix}_selfcluster_keeplast.bed"
+    if [[ -z "$INPUT_DIR" || -z "$OUTPUT_DIR" ]]; then
+        echo "Error: Missing required arguments" >&2
+        show_usage >&2
+        exit 1
+    fi
 
-    # Sort, merge, and retain last base position per strand
-    sort -k1,1 -k2,2n "$bed_file" | \
-    bedtools merge -i stdin -d 70 -s -c 4,5,6 -o distinct | \
-    awk 'BEGIN {FS=OFS="\t"} { if ($6 == "+") $2=$3; else if ($6 == "-") $3=$2; print }' > "$keeplast_file"
+    if [[ ! -d "$INPUT_DIR" ]]; then
+        echo "Error: Input directory not found: $INPUT_DIR" >&2
+        exit 1
+    fi
 
-    echo "Generated: $keeplast_file"
-    keeplast_files+=("$keeplast_file")
-    echo "----------------------------------------"
-done
+    mkdir -p "$OUTPUT_DIR" || {
+        echo "Error: Failed to create output directory" >&2
+        exit 1
+    }
+}
 
-# Ensure at least one intermediate file was created
-if [ ${#keeplast_files[@]} -eq 0 ]; then
-    echo "Error: No intermediate files generated. Exiting."
-    exit 1
-fi
+# Logging system
+log() {
+    local level=$1
+    local message=$2
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [${level^^}] $message"
+}
 
-echo "Step 2: Consolidating all keeplast files into groupA.bed..."
-cat "${keeplast_files[@]}" > "$OUTPUT_DIR/groupA.bed"
-echo "Generated: $OUTPUT_DIR/groupA.bed"
+# Core processing functions
+process_individual_beds() {
+    local -a processed_files
+    log INFO "Processing individual BED files"
 
-echo "Step 3: Sorting, merging, and filtering non-unique sites..."
-bedtools sort -i "$OUTPUT_DIR/groupA.bed" | \
-bedtools merge -i stdin -d 70 -s -c 4,5,6 -o count,distinct,distinct | \
-awk '\$4 > 1' | \
-awk 'BEGIN {FS=OFS="\t"} { if ($6 == "+") $2=$3; else if ($6 == "-") $3=$2; print }' > "$OUTPUT_DIR/groupA_nonunique_keeplast.bed"
-echo "Generated: $OUTPUT_DIR/groupA_nonunique_keeplast.bed"
+    for bed_file in "${INPUT_DIR}"/*.bed; do
+        [[ -f "$bed_file" ]] || continue
+        [[ "$bed_file" == *_keeplast.bed ]] && continue
 
-echo "Step 4: Creating final output file..."
-base_name=$(basename "$BED_DIR")
-final_output="$OUTPUT_DIR/${base_name}_final_site.bed"
-cp "$OUTPUT_DIR/groupA_nonunique_keeplast.bed" "$final_output"
-echo "Generated: $final_output"
+        local base_name=$(basename "${bed_file%.*}")
+        local output_file="${OUTPUT_DIR}/${base_name}_selfcluster_keeplast.bed"
 
-echo "Step 5: Cleaning up intermediate files..."
-rm -f "$OUTPUT_DIR/groupA.bed" "$OUTPUT_DIR/groupA_nonunique_keeplast.bed"
-for file in "${keeplast_files[@]}"; do
-    [[ -f "$file" ]] && rm -f "$file"
-done
+        log DEBUG "Processing: $bed_file"
+        
+        {
+            sort -k1,1 -k2,2n "$bed_file" | \
+            bedtools merge -i stdin -d "$DEFAULT_MERGE_DISTANCE" -s -c 4,5,6 -o distinct | \
+            awk 'BEGIN {FS=OFS="\t"} {
+                if ($6 == "+") $2 = $3
+                else if ($6 == "-") $3 = $2
+                print
+            }'
+        } > "$output_file"
 
-echo "Processing complete. Final BED file available at: $final_output"
+        processed_files+=("$output_file")
+        TEMP_FILES+=("$output_file")
+    done
 
+    if [[ ${#processed_files[@]} -eq 0 ]]; then
+        log ERROR "No valid BED files found in input directory"
+        exit 1
+    fi
+}
+
+merge_group_a() {
+    log INFO "Generating groupA.bed"
+    local group_a="${OUTPUT_DIR}/groupA.bed"
+    cat "${OUTPUT_DIR}"/*_selfcluster_keeplast.bed > "$group_a"
+    TEMP_FILES+=("$group_a")
+}
+
+filter_group_a() {
+    log INFO "Filtering groupA.bed"
+    local input="${OUTPUT_DIR}/groupA.bed"
+    local output="${OUTPUT_DIR}/groupA_nonunique_keeplast.bed"
+
+    bedtools sort -i "$input" | \
+    bedtools merge -i stdin -d "$DEFAULT_MERGE_DISTANCE" -s -c 4,5,6 -o count,distinct,distinct | \
+    awk -v min="$MIN_REPLICATE_COUNT" 'BEGIN {FS=OFS="\t"} $4 >= min' | \ 
+    awk 'BEGIN {FS=OFS="\t"} {
+        if ($6 == "+") $2 = $3
+        else if ($6 == "-") $3 = $2
+        print
+    }' > "$output"
+
+    TEMP_FILES+=("$output")
+}
+
+generate_final_output() {
+    log INFO "Creating final output"
+    local base_name=$(basename "$INPUT_DIR")
+    local final_output="${OUTPUT_DIR}/${base_name}_final_site.bed"
+    
+    cp "${OUTPUT_DIR}/groupA_nonunique_keeplast.bed" "$final_output"
+    log SUCCESS "Final output created: $final_output"
+}
+
+# Main workflow
+main() {
+    parse_arguments "$@"
+    validate_inputs
+    log INFO "Starting BED processing pipeline"
+    log INFO "System Configuration:"
+    log INFO "  Input Directory: $INPUT_DIR"
+    log INFO "  Output Directory: $OUTPUT_DIR"
+    log INFO "  Merge Distance: $DEFAULT_MERGE_DISTANCE"
+    log INFO "  Threads: $THREADS"
+
+    process_individual_beds
+    merge_group_a
+    filter_group_a
+    generate_final_output
+
+    log INFO "Pipeline completed successfully"
+}
+
+main "$@"
