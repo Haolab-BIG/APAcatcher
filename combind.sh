@@ -1,57 +1,129 @@
 #!/bin/bash
 
 # ====================================================
-# 脚本名称: combine_bed_files.sh
-# 功能描述: 遍历指定文件夹中的所有 BED 文件，合并、排序并处理，
-#          最终生成 final_site.bed 文件。
-# 使用方法: ./combine_bed_files.sh /path/to/bed/files /path/to/output
+# SCRIPT: combine_bed_files.sh
+# DESCRIPTION: Traverse BED files in specified directory, merge, sort,
+#              and process to generate final_site.bed
+# USAGE: ./combine_bed_files.sh -i <input_dir> -o <output_dir> [OPTIONS]
 # ====================================================
 
-# 设置脚本在遇到错误时立即退出
 set -e
 
-# 检查是否提供了输入文件夹和输出路径
-if [ $# -ne 2 ]; then
-    echo "用法: $0 /path/to/bed/files /path/to/output"
+# Initialize variables with default values
+INPUT_DIR=""
+OUTPUT_DIR=""
+MERGE_DISTANCE=70
+SORT_MODE="asc"
+SCRIPT_NAME=$(basename "$0")
+
+# Display help information
+usage() {
+    cat <<EOF
+${SCRIPT_NAME} - Merge and process BED files
+
+USAGE:
+    ${SCRIPT_NAME} -i <INPUT_DIR> -o <OUTPUT_DIR> [OPTIONS]
+
+OPTIONS:
+    -i, --input-dir      Directory containing input BED files (required)
+    -o, --output-dir     Output directory for processed files (required)
+    -d, --merge-dist     Maximum distance between features to merge (default: 70)
+    -s, --sort-mode      Sorting mode: 'asc' for ascending, 'desc' for descending (default: asc)
+    -h, --help           Show this help message
+
+EXAMPLES:
+    ${SCRIPT_NAME} -i ./bed_files -o ./results
+    ${SCRIPT_NAME} -i /data/bed -o /output -d 50 -s desc
+EOF
+}
+
+# Parse command-line arguments
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -i|--input-dir)
+            INPUT_DIR="$2"
+            shift
+            ;;
+        -o|--output-dir)
+            OUTPUT_DIR="$2"
+            shift
+            ;;
+        -d|--merge-dist)
+            MERGE_DISTANCE="$2"
+            shift
+            ;;
+        -s|--sort-mode)
+            SORT_MODE="$2"
+            shift
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Error: Unknown parameter: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+# Validate required parameters
+if [[ -z "$INPUT_DIR" || -z "$OUTPUT_DIR" ]]; then
+    echo "Error: Missing required arguments" >&2
+    usage >&2
     exit 1
 fi
 
-INPUT_DIR="$1"
-OUTPUT_DIR="$2"
+# Validate sort mode
+if [[ "$SORT_MODE" != "asc" && "$SORT_MODE" != "desc" ]]; then
+    echo "Error: Invalid sort mode. Use 'asc' or 'desc'" >&2
+    exit 1
+fi
 
-# 确保输出目录存在
-mkdir -p "$OUTPUT_DIR"
+# Configure sort arguments
+if [[ "$SORT_MODE" == "asc" ]]; then
+    SORT_ARGS="-k1,1 -k2,2n"
+else
+    SORT_ARGS="-k1,1 -k2,2nr"
+fi
 
-# 进入输出目录
-cd "$OUTPUT_DIR" || { echo "无法进入目录 $OUTPUT_DIR"; exit 1; }
+# Create output directory if not exists
+mkdir -p "$OUTPUT_DIR" || { echo "Error: Failed to create output directory" >&2; exit 1; }
 
-# 创建临时文件用于合并所有 BED 文件
-temp_file=$(mktemp)
+# Change to output directory
+cd "$OUTPUT_DIR" || { echo "Error: Cannot access output directory" >&2; exit 1; }
 
-# 遍历输入目录中的所有 .bed 文件并合并
-for bed_file in "$INPUT_DIR"/*.bed; do
-    if [[ -f "$bed_file" ]]; then
-        cat "$bed_file" >> "$temp_file"
-    else
-        echo "未找到 BED 文件在 $INPUT_DIR 中。"
-        exit 1
+# Create temporary file
+TMP_FILE=$(mktemp) || { echo "Error: Failed to create temporary file" >&2; exit 1; }
+
+# Merge BED files
+FILE_COUNT=0
+for BED_FILE in "${INPUT_DIR}"/*.bed; do
+    if [[ -f "$BED_FILE" ]]; then
+        cat "$BED_FILE" >> "$TMP_FILE"
+        ((FILE_COUNT++))
     fi
 done
 
-# 合并、排序、合并重叠区域并处理最后的输出
-sort -k1,1 -k2,2n "$temp_file" | \
-bedtools merge -i stdin -d 70 -s -c 4,5,6 -o distinct,first,distinct | \
+if [[ $FILE_COUNT -eq 0 ]]; then
+    echo "Error: No BED files found in input directory" >&2
+    exit 1
+fi
+
+# Process BED data
+echo "Processing ${FILE_COUNT} BED files..."
+sort $SORT_ARGS "$TMP_FILE" | \
+bedtools merge -i stdin -d "$MERGE_DISTANCE" -s -c 4,5,6 -o distinct,first,distinct | \
 awk 'BEGIN {FS=OFS="\t"} {
-  if ($6 == "+") $2 = $3;
-  else if ($6 == "-") $3 = $2;
-  # 清理列5中的多余数据，仅保留第一个有效值
-  split($5, arr, ","); $5 = arr[1]; 
-  print
-}' > combind_site.bed
-echo "生成文件: combind_site.bed"
+    if ($6 == "+") $2 = $3;
+    else if ($6 == "-") $3 = $2;
+    split($5, arr, ","); $5 = arr[1];
+    print
+}' > combined_sites.bed
 
-# 清理临时文件
-rm "$temp_file"
+# Cleanup temporary file
+rm "$TMP_FILE"
 
-echo "所有处理完成。"
-
+echo "Successfully generated: ${OUTPUT_DIR}/combined_sites.bed"
