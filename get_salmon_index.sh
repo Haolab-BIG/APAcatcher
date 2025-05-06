@@ -12,7 +12,7 @@ fi
 # 输入参数
 final_site_bed=$1          # 用户提供的 final_site.bed 文件
 refseq_utr_bed=$2           # 用户提供的 RefSeq_UTR_final.bed 文件
-refseq_last_bed=$3          # 用户提供的 refseq_last.bed 文件
+refseq_last_bed=$3          # 用户提供的 refseq_last_exon.bed 文件
 hg38_fa=$4                 # 用户提供的 UCSC_hg38.fa 文件
 output_fa=$5               # 用户提供的 3UTRisoforms_sequences.fa 输出文件
 output_index=$6            # 用户提供的 Salmon 索引输出目录
