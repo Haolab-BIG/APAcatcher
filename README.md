@@ -33,17 +33,16 @@ Example prediction from depth file
 #2.1 Using PELT and DL model get PloyA sites
 python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_folder high_confidence_pas_folder --tpm_threshold 1 --length_threshold 100  --penalty 50 --min_size 30 --num_processes 8
 
-#2.2 each group cluster
+#2.2 Cluster the sites obtained within each group.
 ./cluster_bed_files.sh <BED_FILES_DIRECTORY> <OUTPUT_DIRECTORY>
 ./cluster_bed_files.sh high_confidence_pas_folder high_confidence_pas_folder/pas.bed
 
 
-#2.3 merge different grop
+#2.3 combind the sites obtained from different groups.
 #if you only have one group pass this command
 ./combind.sh high_confidence_pas_folder high_confidence_pas_folder
 
-
-#2.4 
+#2.4 Remove sites located within 100 bp of annotated sites.
 python process_last.py --input_file s_site.bed --output_file final_site_for_quantification.bed
 
 ```
