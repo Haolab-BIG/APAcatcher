@@ -11,7 +11,7 @@ ruptures==1.1.9
 biopython==1.83
 tqdm==4.66.5
 ```
-## run APAcatcher in 4 step
+## run APAcatcher in 4 steps
 ### 1.generate input files
 ```bash
 python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir -p 8
