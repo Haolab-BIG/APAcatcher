@@ -1,5 +1,5 @@
 # APAcatcher
-## install APAcatcher
+## Install APAcatcher
 ## run APAcatcher in 4 step
 ### 1.generate input files
 ```bash
