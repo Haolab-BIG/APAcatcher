@@ -76,7 +76,8 @@ chr1    1216930   1216930   2                     SDF4%%1               -
 ```bash
 #3.1 build salmon index
 
-./get_salmon_index.sh /final_site_for_quantification.bed /RefSeq_UTR_final.bed /RefSeq_UTR_lastexon_final.bed /hg38.fa /quant_result/3UTRisoforms_sequences.fa /mnt/pengc/APA_project/alogrithm/single_cell/quant_result/3UTRisoforms_library
+./get_salmon_index.sh /final_site_for_quantification.bed /RefSeq_UTR_final.bed /RefSeq_UTR_lastexon_final.bed /hg38.fa \
+/quant_result/3UTRisoforms_sequences.fa /quant_result/3UTRisoforms_library
 
 #3.2 quantification
 ./get_quant.sh 3UTRisoforms_library clean_fastq_dir quant_result_dir
