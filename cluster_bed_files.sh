@@ -36,7 +36,7 @@ trap cleanup EXIT
 # Display help information
 show_usage() {
     cat <<EOF
-${SCRIPT_NAME} v${VERSION} - BED Processing Pipeline
+${SCRIPT_NAME} - BED Processing Pipeline
 
 USAGE:
     ${SCRIPT_NAME} [OPTIONS] -i INPUT_DIR -o OUTPUT_DIR
