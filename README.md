@@ -1,5 +1,16 @@
 # APAcatcher
 ## Install APAcatcher
+Running APAcatcher requires the following packages be installed
+```bash
+python==3.8.18
+numpy==1.24.3
+pandas==2.0.3
+scipy==1.10.1
+torch==2.2.1
+ruptures==1.1.9
+biopython==1.83
+tqdm==4.66.5
+```
 ## run APAcatcher in 4 step
 ### 1.generate input files
 ```bash
