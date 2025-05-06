@@ -22,7 +22,7 @@ The options for running APAcatcher for PAS identification
 --input_folder                  'Path to the input folder containing .txt files.'
 --genome_file                   'Path to the genome fasta file.'
 --output_folder                 'Path to the output folder where results will be saved.'
---tpm_threshold     default=100 'Threshold for the tpm in gene data.'
+--tpm_threshold     default=1 'Threshold for the tpm in gene data.'
 --length_threshold  default=100 'Threshold for the length of gene data.'
 --penalty           default=50  'Penalty value for change point detection.'
 --min_size          default=30  'Minimum size for change point detection.'
