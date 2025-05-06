@@ -27,22 +27,19 @@ else
     exit 1
 fi
 
-# 遍历 folder_list_file 文件中的文件夹路径
 while IFS= read -r folder_name; do
-    folder_name=$(echo "$folder_name" | tr -d '\r\n')  # 去掉回车符和换行符
+    folder_name=$(echo "$folder_name" | tr -d '\r\n') 
     folder_path="$base_dir/$folder_name"
 
     if [ -d "$folder_path" ]; then
         column_name="${folder_name}_TPM"
         
-        # 提取第四列并创建文件
+
         awk -v col="$column_name" 'BEGIN {FS=OFS="\t"} NR==1 {print col} NR>1 {print $4}' "$folder_path/quant.sf" > "${folder_name}_col4.txt"
-        
-        # 合并数据
+
         paste merge.txt "${folder_name}_col4.txt" > merge_temp.txt
         mv merge_temp.txt merge.txt
         
-        # 清理中间文件
         rm "${folder_name}_col4.txt"
     else
         echo "Warning: Directory $folder_path does not exist. Skipping."
