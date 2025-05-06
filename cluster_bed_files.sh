@@ -14,13 +14,11 @@ DEFAULT_MERGE_DISTANCE=70
 MIN_REPLICATE_COUNT=2  
 TEMP_FILES=()
 SCRIPT_NAME=$(basename "$0")
-VERSION="1.0.0"
 
 # Initialize parameters
 INPUT_DIR=""
 OUTPUT_DIR=""
 KEEP_TEMP=false
-THREADS=4
 
 # Cleanup handler
 cleanup() {
@@ -50,10 +48,9 @@ MANDATORY ARGUMENTS:
 OPTIONS:
     -d, --merge-dist     Merging distance (default: ${DEFAULT_MERGE_DISTANCE})
     -c, --min-count      Minimum replicate count (default: ${MIN_REPLICATE_COUNT})
-    -t, --threads        Processing threads (default: ${THREADS})
     -k, --keep-temp      Keep intermediate files
     -h, --help           Show this help message
-    -v, --version        Display version
+
 
 EXAMPLES:
     Basic usage:
@@ -61,7 +58,7 @@ EXAMPLES:
 
     Custom parameters:
     ${SCRIPT_NAME} -i /data/bed -o /output \\
-                   -d 100 -c 3 -t 8 --keep-temp
+                   -d 100 -c 3 --keep-temp
 EOF
 }
 
@@ -85,19 +82,11 @@ parse_arguments() {
                 MIN_REPLICATE_COUNT="$2"
                 shift
                 ;;
-            -t|--threads)
-                THREADS="$2"
-                shift
-                ;;
             -k|--keep-temp)
                 KEEP_TEMP=true
                 ;;
             -h|--help)
                 show_usage
-                exit 0
-                ;;
-            -v|--version)
-                echo "${SCRIPT_NAME} v${VERSION}"
                 exit 0
                 ;;
             *)
@@ -121,12 +110,7 @@ validate_inputs() {
         echo "Error: Invalid merge distance: must be non-negative integer" >&2
         exit 1
     fi
-
-    if ! [[ "$THREADS" =~ ^[1-9][0-9]*$ ]]; then
-        echo "Error: Invalid threads: must be positive integer" >&2
-        exit 1
-    fi
-
+    
     if [[ -z "$INPUT_DIR" || -z "$OUTPUT_DIR" ]]; then
         echo "Error: Missing required arguments" >&2
         show_usage >&2
@@ -227,7 +211,6 @@ main() {
     log INFO "  Input Directory: $INPUT_DIR"
     log INFO "  Output Directory: $OUTPUT_DIR"
     log INFO "  Merge Distance: $DEFAULT_MERGE_DISTANCE"
-    log INFO "  Threads: $THREADS"
 
     process_individual_beds
     merge_group_a
