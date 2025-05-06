@@ -15,10 +15,21 @@ tqdm==4.66.5
 ```
 ## run APAcatcher in 4 steps
 ### 1.generate input files
+Example of original depth_file
+```bash
+chr1    70009   0
+chr1    70010   0
+chr1    70011   0
+chr1    70012   0
+chr1    70013   0
+chr1    70014   0
+...
+```
+add gene%%transcript based on RefSeq_UTR_final.bed
 ```bash
 python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir -p 8
 ```
-Example of Input
+Example of input files
 ```bash
 chr1    70009   0       OR4F5%%1        +
 chr1    70010   0       OR4F5%%1        +
