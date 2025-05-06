@@ -1,6 +1,6 @@
 # APAcatcher
 ## install APAcatcher
-## run APAcatcher in 3 step
+## run APAcatcher in 4 step
 ### 1.generate input files
 ```bash
 python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir -p 8
