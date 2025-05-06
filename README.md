@@ -6,6 +6,11 @@
 python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir -p 8
 ```
 ### 2.get pesudo High confidence APA sites
+The options for running APAcatcher for PAS identification
+
+
+
+
 ```bash
 #2.1 Using PELT and DL model get PloyA sites
 python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_folder high_confidence_pas_folder --tpm_threshold 1 --length_threshold 100  --penalty 50 --min_size 30 --num_processes 8
