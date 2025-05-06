@@ -4,10 +4,10 @@ from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import csv
 import logging
-from model import PAS_CNN
-from data_processing import group_and_filter_by_gene, process_gene
-from sequence_extraction import extract_sequences_from_results
-from model_inference import filter_sequences_with_model
+from model.model import PAS_CNN
+from model.data_processing import group_and_filter_by_gene, process_gene
+from model.sequence_extraction import extract_sequences_from_results
+from model.model_inference import filter_sequences_with_model
 import torch
 import pandas as pd
 # Set up logging
