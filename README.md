@@ -7,10 +7,19 @@ python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir -p 8
 ```
 ### 2.get pesudo High confidence APA sites
 The options for running APAcatcher for PAS identification
+```bash
+--input_folder                  'Path to the input folder containing .txt files.'
+--genome_file                   'Path to the genome fasta file.'
+--output_folder                 'Path to the output folder where results will be saved.'
+--tpm_threshold     default=100 'Threshold for the tpm in gene data.'
+--length_threshold  default=100 'Threshold for the length of gene data.'
+--penalty           default=50  'Penalty value for change point detection.'
+--min_size          default=30  'Minimum size for change point detection.'
+--num_processes     default=4   'Number of parallel processes to use'
+```
 
 
-
-
+command
 ```bash
 #2.1 Using PELT and DL model get PloyA sites
 python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_folder high_confidence_pas_folder --tpm_threshold 1 --length_threshold 100  --penalty 50 --min_size 30 --num_processes 8
