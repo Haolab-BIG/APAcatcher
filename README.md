@@ -28,9 +28,7 @@ The options for running APAcatcher for PAS identification
 --min_size          default=30  'Minimum size for change point detection.'
 --num_processes     default=4   'Number of parallel processes to use'
 ```
-
-
-command
+Example prediction from depth file
 ```bash
 #2.1 Using PELT and DL model get PloyA sites
 python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_folder high_confidence_pas_folder --tpm_threshold 1 --length_threshold 100  --penalty 50 --min_size 30 --num_processes 8
