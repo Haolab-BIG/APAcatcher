@@ -5,7 +5,7 @@
 ```bash
 python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir -p 8
 ```
-### 2.get pesudo High confidence APA sites
+### 2.get high confidence APA sites
 The options for running APAcatcher for PAS identification
 ```bash
 --input_folder                  'Path to the input folder containing .txt files.'
@@ -25,8 +25,8 @@ command
 python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_folder high_confidence_pas_folder --tpm_threshold 1 --length_threshold 100  --penalty 50 --min_size 30 --num_processes 8
 
 #2.2 each group cluster
-./cluster.sh <BED_FILES_DIRECTORY> <OUTPUT_DIRECTORY>
-./cluster.sh high_confidence_pas_folder high_confidence_pas_folder/pas.bed
+./cluster_bed_files.sh <BED_FILES_DIRECTORY> <OUTPUT_DIRECTORY>
+./cluster_bed_files.sh high_confidence_pas_folder high_confidence_pas_folder/pas.bed
 
 
 #2.3 merge different grop
