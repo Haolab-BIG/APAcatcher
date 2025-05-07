@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # ====================================================
+# Author: [ChengPeng]
 # SCRIPT: get_salmon_index.sh
 # DESCRIPTION: Process 3'UTR isoforms and build Salmon index
 # USAGE: ./get_salmon_index.sh [OPTIONS] REQUIRED_ARGS
