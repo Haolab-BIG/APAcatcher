@@ -53,26 +53,28 @@ The options for running APAcatcher for PAS identification
 --min_size          default=30  'Minimum size for change point detection.'
 --num_processes     default=4   'Number of parallel processes to use'
 ```
+#### 2.1 Using PELT and DL model get PloyA sites
 Example prediction from depth file
 ```bash
-#2.1 Using PELT and DL model get PloyA sites
 python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_folder high_confidence_pas_folder
-
-#2.2 Cluster the sites obtained within each group.
+```
+#### #2.2 Cluster the sites obtained within each group.
+Example
+```bash
 ./cluster_bed_files.sh [OPTIONS] -i INPUT_DIR -o OUTPUT_DIR
 ./cluster_bed_files.sh -i high_confidence_pas_folder -o cluster_high_confidence_pas_folder
-
-
-#2.3 combind the sites obtained from different groups.
+```
+#### 2.3 combind the sites obtained from different groups.
+```bash
 #if you only have one group pass this command
 ./combind.sh -i cluster_high_confidence_pas_folder -o cluster_high_confidence_pas_folder/combind
-
-#2.4 Remove sites located within 100 bp of annotated sites.
+```
+#### 2.4 Remove sites located within 100 bp of annotated sites.
+```bash
 #if you only have one group use this bed file
 python process_last.py --input_file pas_site.bed --output_file final_site_for_quantification.bed
 #if you have more than one group use this bed file
 python process_last.py --input_file combind_pas_site.bed --output_file final_site_for_quantification.bed
-
 ```
 Example of high confidence APA sites bed file
 ```bash
