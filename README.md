@@ -61,10 +61,10 @@ python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_fold
 #### 2.2 Cluster the sites obtained within each group.
 The options for cluster the sites obtained within each group
 ```bash
--i, --input-dir      Directory containing input BED files
--o, --output-dir     Output directory for results
--d, --merge-dist     Merging distance (default: 70)
--c, --min-count      Minimum replicate count (default: 2)
+-i      Directory containing input BED files
+-o      Output directory for results
+-d      Merging distance (default: 70)
+-c      Minimum replicate count (default: 2)
 ```
 Example
 ```bash
@@ -153,13 +153,20 @@ The options for get final result
 --length                  Filter by minimum length
 ```
 Example of group_files
-
+```bash
+H1_s1
+H1_s2
+H1_s3
+```
 Example of merge_file(this is the output get from merge_quant.sh)
-
-
-
-
-Exapmle
+```bash
+Name                                Length      EffectiveLength      H1_s1_TPM       H1_s2_TPM       H1_s3_TPM
+NOC2L%%1:-::chr1:944201-944800      599         392.353              373.453708      276.501184      359.036391
+NOC2L%%1:-::chr1:944390-944800      410         216.957              158.405402      216.308677      134.883203
+KLHL17%%1:+::chr1:964962-965721     759         548.792              21.974720       25.823593       29.751596
+...
+```
+Exapmle command
 ```bash
 python get_final_result.py --group_files group_A.txt group_B.txt ... --merge_file final_quant_result.txt --output_dir final_result 
 ```
