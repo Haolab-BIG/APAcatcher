@@ -6,7 +6,7 @@
 # USAGE: ./utr_isoform_processing.sh [OPTIONS] REQUIRED_ARGS
 # ====================================================
 
-set -eo pipefail
+set -euo pipefail
 
 # Configuration
 THREADS=8
