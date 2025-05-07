@@ -1,129 +1,84 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # ====================================================
-# SCRIPT: combine_bed_files.sh
-# DESCRIPTION: Traverse BED files in specified directory, merge, sort,
-#              and process to generate final_site.bed
-# USAGE: ./combine_bed_files.sh -i <input_dir> -o <output_dir> [OPTIONS]
+# Script Name : combine_bed_files.sh
+# Description : Iterate through all BED files in a specified directory,
+#               merge, sort, process intervals, and output final_site.bed
+# Usage       : combine.sh -i <input_dir> -o <output_dir> [-d <merge_distance>]
+# Options     :
+#   -i INPUT_DIR       Path to directory containing BED files (required)
+#   -o OUTPUT_DIR      Path to directory for output files (required)
+#   -d MERGE_DISTANCE  Maximum distance between intervals to merge (default: 70)
+#   -h                 Show help message and exit
 # ====================================================
 
-set -e
+set -euo pipefail
 
-# Initialize variables with default values
-INPUT_DIR=""
-OUTPUT_DIR=""
+# Default parameters
 MERGE_DISTANCE=70
-SORT_MODE="asc"
-SCRIPT_NAME=$(basename "$0")
 
-# Display help information
+# Print usage information
 usage() {
-    cat <<EOF
-${SCRIPT_NAME} - Merge and process BED files
+  cat << EOF
+Usage: $0 -i <input_dir> -o <output_dir> [-d <merge_distance>]
 
-USAGE:
-    ${SCRIPT_NAME} -i <INPUT_DIR> -o <OUTPUT_DIR> [OPTIONS]
-
-OPTIONS:
-    -i, --input-dir      Directory containing input BED files (required)
-    -o, --output-dir     Output directory for processed files (required)
-    -d, --merge-dist     Maximum distance between features to merge (default: 70)
-    -s, --sort-mode      Sorting mode: 'asc' for ascending, 'desc' for descending (default: asc)
-    -h, --help           Show this help message
-
-EXAMPLES:
-    ${SCRIPT_NAME} -i ./bed_files -o ./results
-    ${SCRIPT_NAME} -i /data/bed -o /output -d 50 -s desc
+Options:
+  -i INPUT_DIR       Path to directory containing BED files (required)
+  -o OUTPUT_DIR      Path to directory for output files (required)
+  -d MERGE_DISTANCE  Maximum separation (in bases) to merge intervals (default: ${MERGE_DISTANCE})
+  -h                 Show this help message and exit
 EOF
+  exit 1
 }
 
-# Parse command-line arguments
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
-        -i|--input-dir)
-            INPUT_DIR="$2"
-            shift
-            ;;
-        -o|--output-dir)
-            OUTPUT_DIR="$2"
-            shift
-            ;;
-        -d|--merge-dist)
-            MERGE_DISTANCE="$2"
-            shift
-            ;;
-        -s|--sort-mode)
-            SORT_MODE="$2"
-            shift
-            ;;
-        -h|--help)
-            usage
-            exit 0
-            ;;
-        *)
-            echo "Error: Unknown parameter: $1" >&2
-            usage >&2
-            exit 1
-            ;;
-    esac
-    shift
+# Parse command-line options
+while getopts ":i:o:d:h" opt; do
+  case ${opt} in
+    i ) INPUT_DIR=${OPTARG} ;;
+    o ) OUTPUT_DIR=${OPTARG} ;;
+    d ) MERGE_DISTANCE=${OPTARG} ;;
+    h ) usage ;;
+    \? ) echo "Invalid option: -${OPTARG}" >&2 ; usage ;;
+    : ) echo "Option -${OPTARG} requires an argument." >&2 ; usage ;;
+  esac
 done
 
-# Validate required parameters
-if [[ -z "$INPUT_DIR" || -z "$OUTPUT_DIR" ]]; then
-    echo "Error: Missing required arguments" >&2
-    usage >&2
-    exit 1
+# Ensure required arguments are provided
+if [[ -z "${INPUT_DIR:-}" || -z "${OUTPUT_DIR:-}" ]]; then
+  echo "Error: Both -i and -o options are required." >&2
+  usage
 fi
 
-# Validate sort mode
-if [[ "$SORT_MODE" != "asc" && "$SORT_MODE" != "desc" ]]; then
-    echo "Error: Invalid sort mode. Use 'asc' or 'desc'" >&2
-    exit 1
-fi
+# Create output directory if it doesn't exist
+mkdir -p "${OUTPUT_DIR}"
+cd "${OUTPUT_DIR}" || { echo "Cannot change to directory ${OUTPUT_DIR}" >&2; exit 1; }
 
-# Configure sort arguments
-if [[ "$SORT_MODE" == "asc" ]]; then
-    SORT_ARGS="-k1,1 -k2,2n"
-else
-    SORT_ARGS="-k1,1 -k2,2nr"
-fi
+# Temporary file for merging BED contents
+temp_file=$(mktemp)
+trap 'rm -f "$temp_file"' EXIT
 
-# Create output directory if not exists
-mkdir -p "$OUTPUT_DIR" || { echo "Error: Failed to create output directory" >&2; exit 1; }
-
-# Change to output directory
-cd "$OUTPUT_DIR" || { echo "Error: Cannot access output directory" >&2; exit 1; }
-
-# Create temporary file
-TMP_FILE=$(mktemp) || { echo "Error: Failed to create temporary file" >&2; exit 1; }
-
-# Merge BED files
-FILE_COUNT=0
-for BED_FILE in "${INPUT_DIR}"/*.bed; do
-    if [[ -f "$BED_FILE" ]]; then
-        cat "$BED_FILE" >> "$TMP_FILE"
-        ((FILE_COUNT++))
-    fi
+# Concatenate all BED files
+shopt -s nullglob
+for bed_file in "${INPUT_DIR}"/*.bed; do
+  if [[ -r "${bed_file}" ]]; then
+    cat "${bed_file}" >> "${temp_file}"
+  else
+    echo "Warning: Cannot read ${bed_file}, skipping." >&2
+  fi
 done
+shopt -u nullglob
 
-if [[ $FILE_COUNT -eq 0 ]]; then
-    echo "Error: No BED files found in input directory" >&2
-    exit 1
-fi
-
-# Process BED data
-echo "Processing ${FILE_COUNT} BED files..."
-sort $SORT_ARGS "$TMP_FILE" | \
-bedtools merge -i stdin -d "$MERGE_DISTANCE" -s -c 4,5,6 -o distinct,first,distinct | \
+# Merge, sort, merge nearby intervals, and post-process
+sort -k1,1 -k2,2n "${temp_file}" | \
+bedtools merge -i stdin -d ${MERGE_DISTANCE} -s -c 4,5,6 -o distinct,first,distinct | \
 awk 'BEGIN {FS=OFS="\t"} {
-    if ($6 == "+") $2 = $3;
-    else if ($6 == "-") $3 = $2;
-    split($5, arr, ","); $5 = arr[1];
-    print
-}' > combined_sites.bed
+  # For '+' strand, set end = start; for '-' strand, set start = end
+  if ($6 == "+") $3 = $2 + 1;
+  else if ($6 == "-") $2 = $3 - 1;
+  # Retain only the first comma-delimited value in column 5
+  split($5, arr, ","); $5 = arr[1];
+  print
+}' > combined_site.bed
 
-# Cleanup temporary file
-rm "$TMP_FILE"
-
-echo "Successfully generated: ${OUTPUT_DIR}/combined_sites.bed"
+echo "Generated file: combined_site.bed"
+echo "Processing complete."
