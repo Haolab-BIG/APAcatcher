@@ -258,8 +258,8 @@ python get_final_result.py \
 #### Final 3UTR index example
 
 ```
-# Name                                     Length  Transcript  start       end         strand  sample1_indexUTR  sample2_indexUTR  sample3_indexUTR
-AACS%%3:+::chr12:125142091-125142380      289     AACS%%3      125142091   125142380   +       0.6331            0.8141            0.6945
+# Name                                    Length  Transcript   start       end         strand    sample1_indexUTR  sample2_indexUTR  sample3_indexUTR
+AACS%%3:+::chr12:125142091-125142380      289     AACS%%3      125142091   125142380   +         0.6331            0.8141            0.6945
 …
 ```
 
