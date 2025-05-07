@@ -4,29 +4,28 @@ from typing import Optional
 
 def process_transcript_group(group: pd.DataFrame) -> pd.DataFrame:
     """Process transcript groups by strand-specific filtering.
-    
     Args:
         group: DataFrame containing genomic coordinates for a single transcript
     
     Returns:
         Filtered DataFrame with removed entries based on proximity criteria
     """
-    if group.empty:
+    if group.empty or len(group) == 1:
         return group
 
     strand = group["strand"].iloc[0]
     
     if strand == "+":
-        # Handle positive strand: keep longest 3'UTR
         sorted_ends = group["end"].sort_values(ascending=False).unique()
         if len(sorted_ends) > 1 and (sorted_ends[0] - sorted_ends[1] <= 100):
-            return group[group["end"] == sorted_ends[0]]
+            second_max_end = sorted_ends[1]
+            return group[group["end"] != second_max_end]
             
     elif strand == "-":
-        # Handle negative strand: keep longest 5'UTR
         sorted_starts = group["start"].sort_values().unique()
         if len(sorted_starts) > 1 and (sorted_starts[1] - sorted_starts[0] <= 100):
-            return group[group["start"] == sorted_starts[0]]
+            second_min_start = sorted_starts[1]
+            return group[group["start"] != second_min_start]
     
     return group
 
