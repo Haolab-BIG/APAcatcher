@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ====================================================
-# SCRIPT: utr_isoform_processing.sh
+# SCRIPT: get_salmon_index.sh
 # DESCRIPTION: Process 3'UTR isoforms and build Salmon index
-# USAGE: ./utr_isoform_processing.sh [OPTIONS] REQUIRED_ARGS
+# USAGE: ./get_salmon_index.sh [OPTIONS] REQUIRED_ARGS
 # ====================================================
 
 set -euo pipefail
@@ -11,22 +11,9 @@ set -euo pipefail
 # Parse command line arguments with option flags
 
 usage() {
-  cat <<EOF
-Usage: $0 [OPTIONS]
-
-Required arguments:
-  -f FINAL_SITE_BED    Path to final_site.bed
-  -r REFSEQ_UTR_BED    Path to RefSeq_UTR_final.bed
-  -l REFSEQ_LAST_BED   Path to refseq_last_exon.bed
-  -g HG38_FASTA        Path to UCSC_hg38.fa
-  -o OUTPUT_FASTA      Output FASTA filename for 3UTR isoforms
-  -i SAMPLON_INDEX_DIR Output directory for Salmon index
-  
-EOF
-  exit 1
+    echo "Usage: $0 -f <final_site_bed> -r <refseq_utr_bed> -l <refseq_last_bed> -g <hg38_fa> -o <output_fa> -i <output_index>"
+    exit 1
 }
-
-
 
 while getopts ":f:r:l:g:o:i:" opt; do
     case $opt in
