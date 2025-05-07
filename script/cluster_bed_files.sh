@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # ====================================================
+# Author: [ChengPeng]
 # SCRIPT: cluster_bed_files.sh
 # DESCRIPTION: Batch process BED files through sorting, merging,
 #              filtering, and generate final_site.bed
