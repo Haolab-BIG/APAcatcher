@@ -15,7 +15,7 @@ tqdm==4.66.5
 ```
 ## run APAcatcher in 4 steps
 ### 1.generate input files
-Example of original depth_file
+#### Example of original depth_file
 ```bash
 chr1    70009   0
 chr1    70010   0
@@ -29,7 +29,7 @@ First you need add gene%%transcript and strand based on RefSeq_UTR_final.bed
 ```bash
 python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir
 ```
-An example of the depth file after adding the information of gene%%transcript and strand
+#### An example of the depth file after adding the information of gene%%transcript and strand
 ```bash
 chr1    70009   0       OR4F5%%1        +
 chr1    70010   0       OR4F5%%1        +
@@ -42,6 +42,7 @@ chr1    70016   0       OR4F5%%1        +
 ...
 ```
 ### 2.get high confidence APA sites
+#### 2.1 Using PELT and DL model get PloyA sites
 The options for running APAcatcher for PAS identification
 ```bash
 --input_folder                  'Path to the input folder containing .txt files.'
@@ -53,18 +54,31 @@ The options for running APAcatcher for PAS identification
 --min_size          default=30  'Minimum size for change point detection.'
 --num_processes     default=4   'Number of parallel processes to use'
 ```
-#### 2.1 Using PELT and DL model get PloyA sites
 Example prediction from depth file
 ```bash
 python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_folder high_confidence_pas_folder
 ```
-#### #2.2 Cluster the sites obtained within each group.
+#### 2.2 Cluster the sites obtained within each group.
+The options for cluster the sites obtained within each group
+```bash
+-i, --input-dir      Directory containing input BED files
+-o, --output-dir     Output directory for results
+-d, --merge-dist     Merging distance (default: 70)
+-c, --min-count      Minimum replicate count (default: 2)
+```
 Example
 ```bash
 ./cluster_bed_files.sh [OPTIONS] -i INPUT_DIR -o OUTPUT_DIR
 ./cluster_bed_files.sh -i high_confidence_pas_folder -o cluster_high_confidence_pas_folder
 ```
 #### 2.3 combind the sites obtained from different groups.
+The options for combind ths sites obtained from different groups
+```bash
+-i INPUT_DIR       Path to directory containing BED files (required)
+-o OUTPUT_DIR      Path to directory for output files (required)
+-d MERGE_DISTANCE  Merging distance (default: 70)
+```
+Example
 ```bash
 #if you only have one group pass this command
 ./combind.sh -i cluster_high_confidence_pas_folder -o cluster_high_confidence_pas_folder/combind
@@ -76,7 +90,7 @@ python process_last.py --input_file pas_site.bed --output_file final_site_for_qu
 #if you have more than one group use this bed file
 python process_last.py --input_file combind_pas_site.bed --output_file final_site_for_quantification.bed
 ```
-Example of high confidence APA sites bed file
+#### Example of high confidence APA sites bed file
 ```bash
 #chr    #start    #end     #cluster size         #gene%%transcript     #strand
 chr1    944201    944201    4                     NOC2L%%1              -
@@ -149,7 +163,7 @@ Exapmle
 ```bash
 python get_final_result.py --group_files group_A.txt group_B.txt ... --merge_file final_quant_result.txt --output_dir final_result 
 ```
-Example of 3UTR_index file
+#### Example of 3UTR_index file
 ```bash
 #Name                                   Length  Transcript      start           end           strand    sample1_indexUTR        sample2_indexUTR          sample3_indexUTR
 AACS%%3:+::chr12:125142091-125142380    289     AACS%%3         125142091       125142380     +         0.6331098039907349      0.8141000731552296        0.6945178987151257
