@@ -6,7 +6,7 @@
 # USAGE: ./tpm_matrix_merger.sh [OPTIONS] -l SAMPLE_LIST -b BASE_DIR -o OUTPUT_FILE
 # ====================================================
 
-set -eo pipefail
+set -euo pipefail
 
 # Configuration
 TEMP_FILES=()
