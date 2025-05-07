@@ -87,15 +87,30 @@ chr1    1216930   1216930   2                     SDF4%%1               -
 ```
 ### 3.using salmon to quantification
 #### 3.1 build salmon index
+The options for build salmon index
 ```bash
-
-./get_salmon_index.sh -f <final_site_bed> -r <refseq_utr_bed> -l <refseq_last_bed> -g <hg38_fa> -o <output_fa> -i <output_index>
-
-
+-f FINAL_SITE_BED        Path to final_site.bed
+-u REFSEQ_UTR_BED        Path to RefSeq_UTR_final.bed
+-l REFSEQ_LAST_BED       Path to refseq_last_exon.bed
+-g HG38_FASTA            Path to UCSC_hg38.fa
+-o OUTPUT_FASTA          Output FASTA filename for 3UTR isoforms
+-i SAMPLON_INDEX_DIR     Output directory for Salmon index
+```
+Example
+```
+./get_salmon_index.sh -f <final_site_bed> -r <refseq_utr_bed> -l <refseq_last_exon_bed> -g <hg38_fa> -o <output_fa> -i <output_index>
 ```
 ##### 3.2 quantification
+The options for salmon quantification
+
 ```bash
-./get_quant.sh 3UTRisoforms_library clean_fastq_dir quant_result_dir
+-i SAMPLON_INDEX_DIR     input directory for Salmon index(3UTRisoforms_library)
+-d FASTQ_DIR             input directory for fastq files
+-o OUTPUT_DIR            output directory for quantification result
+```
+
+```bash
+./get_quant.sh -i <salmon_path> -d <fastq_directory> -o <output_directory>
 ```
 
 #### 3.3 merge quant result from different sample
