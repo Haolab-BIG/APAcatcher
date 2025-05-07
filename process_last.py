@@ -1,56 +1,105 @@
 import pandas as pd
 import argparse
+from typing import Optional
 
-def process_group(group):
-    """处理每个分组，按照链的不同进行过滤"""
-    # 处理正链（+）
-    if group["strand"].iloc[0] == "+":
-        # 查找最大值和第二大值的差异
-        max_value = group["end"].max()
-        second_max_value = group[group["end"] != max_value]["end"].max()
-        if max_value - second_max_value <= 100:
-            # 保留最大值，删除第二大的
-            group = group[group["end"] != second_max_value]
+def process_transcript_group(group: pd.DataFrame) -> pd.DataFrame:
+    """Process transcript groups by strand-specific filtering.
+    
+    Args:
+        group: DataFrame containing genomic coordinates for a single transcript
+    
+    Returns:
+        Filtered DataFrame with removed entries based on proximity criteria
+    """
+    if group.empty:
+        return group
 
-    # 处理负链（-）
-    elif group["strand"].iloc[0] == "-":
-        # 查找最小值和第二小值的差异
-        min_value = group["start"].min()
-        second_min_value = group[group["start"] != min_value]["start"].min()
-        if second_min_value - min_value <= 100:
-            # 保留最小值，删除第二小的
-            group = group[group["start"] != second_min_value]
-
+    strand = group["strand"].iloc[0]
+    
+    if strand == "+":
+        # Handle positive strand: keep longest 3'UTR
+        sorted_ends = group["end"].sort_values(ascending=False).unique()
+        if len(sorted_ends) > 1 and (sorted_ends[0] - sorted_ends[1] <= 100):
+            return group[group["end"] == sorted_ends[0]]
+            
+    elif strand == "-":
+        # Handle negative strand: keep longest 5'UTR
+        sorted_starts = group["start"].sort_values().unique()
+        if len(sorted_starts) > 1 and (sorted_starts[1] - sorted_starts[0] <= 100):
+            return group[group["start"] == sorted_starts[0]]
+    
     return group
 
-def process_bed_file(input_file, output_file):
-    """读取BED文件，处理后保存输出文件"""
-    # 读取BED文件
-    df = pd.read_csv(input_file, sep="\t", header=None, names=["chr", "start", "end", "score", "Transcript", "strand"])
-
-    # 按照 Transcript 和 start 排序
-    df_sorted = df.sort_values(by=["Transcript", "start"])
-
-    # 按照 Transcript 分组并应用处理函数
-    df_processed = df_sorted.groupby("Transcript").apply(process_group).reset_index(drop=True)
-
-    # 保存处理后的数据到输出文件
-    df_processed_sorted = df_processed.sort_values(by=["chr","start","end"])
-    df_processed_sorted.to_csv(output_file, sep="\t", header=False, index=False)
-
-    print(f"处理完成，结果已保存到 {output_file}")
-
-def main():
-    # 使用 argparse 解析命令行参数
-    parser = argparse.ArgumentParser(description="处理 BED 文件，删除符合条件的行")
-    parser.add_argument("--input_file", type=str, help="输入 BED 文件的路径")
-    parser.add_argument("--output_file", type=str, help="输出处理后的文件路径")
+def process_bed_file(input_path: str, output_path: str) -> None:
+    """Process BED file through genomic coordinate filtering.
     
-    args = parser.parse_args()
+    Args:
+        input_path: Path to input BED file
+        output_path: Path for output processed BED file
+    """
+    # Load data with type validation
+    column_names = [
+        "chr", "start", "end", 
+        "score", "transcript_id", "strand"
+    ]
+    
+    df = pd.read_csv(
+        input_path,
+        sep="\t",
+        header=None,
+        names=column_names,
+        dtype={
+            "chr": "category",
+            "start": "int32",
+            "end": "int32",
+            "strand": "category"
+        }
+    )
 
-    # 调用处理函数
-    process_bed_file(args.input_file, args.output_file)
+    # Process genomic coordinates
+    processed_df = (
+        df.sort_values(["transcript_id", "start"])
+          .groupby("transcript_id", group_keys=False)
+          .apply(process_transcript_group)
+    )
+
+    # Save sorted results maintaining BED format
+    (
+        processed_df.sort_values(["chr", "start", "end"])
+        [column_names]  # Maintain original column order
+        .to_csv(output_path, sep="\t", header=False, index=False)
+    )
+
+    print(f"Processing complete. Results saved to: {output_path}")
+
+def main() -> None:
+    """Command-line interface for BED file processing."""
+    parser = argparse.ArgumentParser(
+        description="BED File Processor - Remove proximal genomic features by strand-specific criteria",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    
+    parser.add_argument(
+        "-i", "--input", 
+        required=True,
+        help="Input BED file path",
+        metavar="INPUT.bed"
+    )
+    
+    parser.add_argument(
+        "-o", "--output",
+        required=True,
+        help="Output BED file path",
+        metavar="OUTPUT.bed"
+    )
+
+    args = parser.parse_args()
+    
+    try:
+        process_bed_file(args.input, args.output)
+    except Exception as e:
+        print(f"Error processing file: {str(e)}")
+        raise SystemExit(1) from e
 
 if __name__ == "__main__":
     main()
-
