@@ -6,7 +6,7 @@
 # USAGE: ./get_salmon_index.sh [OPTIONS] REQUIRED_ARGS
 # ====================================================
 
-set -euo pipefail
+set -e
 
 # Parse command line arguments with option flags
 
