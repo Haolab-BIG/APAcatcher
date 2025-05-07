@@ -1,9 +1,3 @@
-已思考若干秒
-
-
-Here’s a polished, professional version of your README:
-
----
 
 # APAcatcher
 
