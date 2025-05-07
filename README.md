@@ -59,13 +59,13 @@ Example prediction from depth file
 python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_folder high_confidence_pas_folder
 
 #2.2 Cluster the sites obtained within each group.
-./cluster_bed_files.sh <BED_FILES_DIRECTORY> <OUTPUT_DIRECTORY>
-./cluster_bed_files.sh high_confidence_pas_folder high_confidence_pas_folder/pas.bed
+./cluster_bed_files.sh [OPTIONS] -i INPUT_DIR -o OUTPUT_DIR
+./cluster_bed_files.sh -i high_confidence_pas_folder -o cluster_high_confidence_pas_folder
 
 
 #2.3 combind the sites obtained from different groups.
 #if you only have one group pass this command
-./combind.sh -i high_confidence_pas_folder high_confidence_pas_folder/combind_pas_site.bed
+./combind.sh -i cluster_high_confidence_pas_folder -o cluster_high_confidence_pas_folder/combind
 
 #2.4 Remove sites located within 100 bp of annotated sites.
 #if you only have one group use this bed file
