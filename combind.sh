@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # ====================================================
-# Script Name : combine_bed_files.sh
+# Script Name : combine.sh
 # Description : Iterate through all BED files in a specified directory,
 #               merge, sort, process intervals, and output final_site.bed
 # Usage       : combine.sh -i <input_dir> -o <output_dir> [-d <merge_distance>]
