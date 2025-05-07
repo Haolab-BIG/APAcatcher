@@ -7,7 +7,7 @@
 # USAGE: ./cluster_bed_files.sh [OPTIONS] -i INPUT_DIR -o OUTPUT_DIR
 # ====================================================
 
-set -eo pipefail
+set -euo pipefail
 
 # Configuration
 DEFAULT_MERGE_DISTANCE=70
