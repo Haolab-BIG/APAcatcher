@@ -183,7 +183,7 @@ filter_group_a() {
 
     bedtools sort -i "$input" | \
     bedtools merge -i stdin -d "$DEFAULT_MERGE_DISTANCE" -s -c 4,5,6 -o count,distinct,distinct | \
-    awk -v min="$MIN_REPLICATE_COUNT" 'BEGIN {FS=OFS="\t"} $4 >= min' | \ 
+    awk -v min="$MIN_REPLICATE_COUNT" 'BEGIN {FS=OFS="\t"} $4 >= min' | \
     awk 'BEGIN {FS=OFS="\t"} {
         if ($6 == "+") $2 = $3
         else if ($6 == "-") $3 = $2
