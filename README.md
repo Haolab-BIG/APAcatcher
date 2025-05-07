@@ -1,179 +1,271 @@
+已思考若干秒
+
+
+Here’s a polished, professional version of your README:
+
+---
+
 # APAcatcher
 
-## Install APAcatcher
-We recommend to creat a conda enviroment firstly using conda create -n apacatcher_env python=3.8 and then conda activate apacatcher_env
-Running APAcatcher requires the following packages be installed
+## Installation
+
+We recommend creating a dedicated Conda environment:
+
 ```bash
-python==3.8.18
-numpy==1.24.3
-pandas==2.0.3
-scipy==1.10.1
-torch==2.2.1
-ruptures==1.1.9
-biopython==1.83
-tqdm==4.66.5
+conda create -n apacatcher_env python=3.8
+conda activate apacatcher_env
 ```
-## run APAcatcher in 4 steps
-### 1.generate input files
-#### Example of original depth_file
+
+Then install the required Python packages:
+
 ```bash
+pip install \
+  numpy==1.24.3 \
+  pandas==2.0.3 \
+  scipy==1.10.1 \
+  torch==2.2.1 \
+  ruptures==1.1.9 \
+  biopython==1.83 \
+  tqdm==4.66.5
+```
+
+> **Note:** The script has been tested with Python 3.8.18.
+
+---
+
+## Usage Overview
+
+APAcatcher operates in four main stages:
+
+1. **Generate input files**
+2. **Identify high-confidence APA sites**
+3. **Quantify with Salmon**
+4. **Assemble the final data matrix**
+
+---
+
+### 1. Generate Input Files
+
+#### Original depth file format
+
+```
 chr1    70009   0
 chr1    70010   0
 chr1    70011   0
-chr1    70012   0
-chr1    70013   0
-chr1    70014   0
-...
-```
-First you need add gene%%transcript and strand based on RefSeq_UTR_final.bed
-```bash
-python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir
-```
-#### An example of the depth file after adding the information of gene%%transcript and strand
-```bash
-chr1    70009   0       OR4F5%%1        +
-chr1    70010   0       OR4F5%%1        +
-chr1    70011   0       OR4F5%%1        +
-chr1    70012   0       OR4F5%%1        +
-chr1    70013   0       OR4F5%%1        +
-chr1    70014   0       OR4F5%%1        +
-chr1    70015   0       OR4F5%%1        +
-chr1    70016   0       OR4F5%%1        +
-...
-```
-### 2.get high confidence APA sites
-#### 2.1 Using PELT and DL model get PloyA sites
-The options for running APAcatcher for PAS identification
-```bash
---input_folder                  'Path to the input folder containing .txt files.'
---genome_file                   'Path to the genome fasta file.'
---output_folder                 'Path to the output folder where results will be saved.'
---tpm_threshold     default=1   'Threshold for the tpm.'
---length_threshold  default=100 'Threshold for the length of 3'UTR.'
---penalty           default=50  'Penalty value for change point detection.'
---min_size          default=30  'Minimum size for change point detection.'
---num_processes     default=4   'Number of parallel processes to use'
-```
-Example prediction from depth file
-```bash
-python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_folder high_confidence_pas_folder
-```
-#### 2.2 Cluster the sites obtained within each group.
-The options for cluster the sites obtained within each group
-```bash
--i      Directory containing input BED files
--o      Output directory for results
--d      Merging distance (default: 70)
--c      Minimum replicate count (default: 2)
-```
-Example
-```bash
-./cluster_bed_files.sh [OPTIONS] -i INPUT_DIR -o OUTPUT_DIR
-./cluster_bed_files.sh -i high_confidence_pas_folder -o cluster_high_confidence_pas_folder
-```
-#### 2.3 combind the sites obtained from different groups.
-The options for combind ths sites obtained from different groups
-```bash
--i INPUT_DIR       Path to directory containing BED files (required)
--o OUTPUT_DIR      Path to directory for output files (required)
--d MERGE_DISTANCE  Merging distance (default: 70)
-```
-Example
-```bash
-#if you only have one group pass this command
-./combind.sh -i cluster_high_confidence_pas_folder -o cluster_high_confidence_pas_folder/combind
-```
-#### 2.4 Remove sites located within 100 bp of annotated sites.
-```bash
-#if you only have one group use this bed file
-python process_last.py --input_file pas_site.bed --output_file final_site_for_quantification.bed
-#if you have more than one group use this bed file
-python process_last.py --input_file combind_pas_site.bed --output_file final_site_for_quantification.bed
-```
-#### Example of high confidence APA sites bed file
-```bash
-#chr    #start    #end     #cluster size         #gene%%transcript     #strand
-chr1    944201    944201    4                     NOC2L%%1              -
-chr1    965721    965721    2                     KLHL17%%1             +
-chr1    1014542   1014542   2                     ISG15%%1              +
-chr1    1056118   1056118   2                     AGRN%%1               +
-chr1    1081822   1081822   2                     C1orf159%%1           -
-chr1    1216930   1216930   2                     SDF4%%1               -
-...
-```
-### 3.using salmon to quantification
-#### 3.1 build salmon index
-The options for build salmon index
-```bash
--f FINAL_SITE_BED        Path to final_site.bed(get from process_last.py)
--u REFSEQ_UTR_BED        Path to RefSeq_UTR_final.bed
--l REFSEQ_LAST_BED       Path to refseq_last_exon.bed
--g HG38_FASTA            Path to UCSC_hg38.fa
--o OUTPUT_FASTA          Output FASTA filename for 3UTR isoforms(3UTRisoforms.fa)
--i SAMPLON_INDEX_DIR     Output directory for Salmon index(3UTRisoforms_library)
-```
-Example
-```
-./get_salmon_index.sh -f <final_site_bed> -r <refseq_utr_bed> -l <refseq_last_exon_bed> -g <hg38_fa> -o <output_fa> -i <output_index>
-```
-#### 3.2 quantification
-The options for salmon quantification
-
-```bash
--i SAMPLON_INDEX_DIR     input directory for Salmon index(3UTRisoforms_library)
--d FASTQ_DIR             input directory for fastq files
--o OUTPUT_DIR            output directory for quantification result
-```
-Example
-```bash
-./get_quant.sh -i <salmon_path> -d <fastq_directory> -o <output_directory>
+…
 ```
 
-#### 3.3 merge quant result from different sample
-The options for merge quantification in different samples
-```bash
-USAGE:
-    merge_quant.sh [OPTIONS] -l SAMPLE_LIST -b BASE_DIR -o OUTPUT_FILE
+First, annotate each depth file with gene%%transcript and strand information (based on `RefSeq_UTR_final.bed`):
 
-MANDATORY ARGUMENTS:
-    -l, --sample-list    File containing list of sample directories
-    -b, --base-dir       Base directory containing sample folders
-    -o, --output         Merged output file path
-```
-Example of merge quantification
 ```bash
-merge_quant.sh -l sample_list.txt -b /data/quant -o merged_tpm.txt
+python add_geneinfo.py \
+  -g RefSeq_UTR_final.bed \
+  -d depth_file_dir
 ```
-### 4.get data matrix for downstream analysis
-The options for get final result
+
+#### Annotated depth file example
+
+```
+chr1    70009   0   OR4F5%%1    +
+chr1    70010   0   OR4F5%%1    +
+chr1    70011   0   OR4F5%%1    +
+…
+```
+
+---
+
+### 2. Identify High-Confidence APA Sites
+
+#### 2.1 PAS detection with PELT + Deep Learning
+
+Options for `main.py`:
+
+| Flag                 | Description                        | Default |
+| -------------------- | ---------------------------------- | ------- |
+| `--input_folder`     | Path to annotated depth files      |         |
+| `--genome_file`      | Reference genome FASTA             |         |
+| `--output_folder`    | Directory to save predicted PAS    |         |
+| `--tpm_threshold`    | Minimum TPM to consider            | `1`     |
+| `--length_threshold` | Minimum 3' UTR length (bp)         | `100`   |
+| `--penalty`          | Penalty for change-point detection | `50`    |
+| `--min_size`         | Minimum segment size for PELT      | `30`    |
+| `--num_processes`    | Number of parallel workers         | `4`     |
+
+**Example:**
+
 ```bash
---group_files             Paths to multiple sample group files(.txt)
---merge_file              Path to merged quantification file(.txt)
---output_dir              Directory to save output txt files
---length                  Filter by minimum length
+python main.py \
+  --input_folder depth_file_dir \
+  --genome_file hg38.fa \
+  --output_folder high_confidence_pas_folder
 ```
-Example of group_files
-```txt
-H1_s1
-H1_s2
-H1_s3
-```
-Example of merge_file(this is the output get from merge_quant.sh)
+
+---
+
+#### 2.2 Intra-group clustering
+
+Options for `cluster_bed_files.sh`:
+
+| Flag | Description                         | Default |
+| ---- | ----------------------------------- | ------- |
+| `-i` | Directory with per-sample BED files |         |
+| `-o` | Output directory                    |         |
+| `-d` | Merge distance (bp)                 | `70`    |
+| `-c` | Minimum replicate count             | `2`     |
+
+**Example:**
+
 ```bash
-Name                                Length      EffectiveLength      H1_s1_TPM       H1_s2_TPM       H1_s3_TPM
-NOC2L%%1:-::chr1:944201-944800      599         392.353              373.453708      276.501184      359.036391
-NOC2L%%1:-::chr1:944390-944800      410         216.957              158.405402      216.308677      134.883203
-KLHL17%%1:+::chr1:964962-965721     759         548.792              21.974720       25.823593       29.751596
-...
+./cluster_bed_files.sh \
+  -i high_confidence_pas_folder \
+  -o cluster_high_confidence_pas_folder
 ```
-Exapmle command
+
+---
+
+#### 2.3 Inter-group merging
+
+Options for `combind.sh`:
+
+| Flag                | Description                    | Default |
+| ------------------- | ------------------------------ | ------- |
+| `-i`                | Directory with group BED files |         |
+| `-o`                | Output directory               |         |
+| `-d MERGE_DISTANCE` | Merge distance (bp)            | `70`    |
+
+**Example (single group):**
+
 ```bash
-python get_final_result.py --group_files group_A.txt group_B.txt ... --merge_file final_quant_result.txt --output_dir final_result 
+./combind.sh \
+  -i cluster_high_confidence_pas_folder \
+  -o cluster_high_confidence_pas_folder/combind
 ```
-#### Example of 3UTR_index file
+
+---
+
+#### 2.4 Remove annotated-proximal sites
+
+Options for `process_last.py`:
+
 ```bash
-#Name                                   Length  Transcript      start           end           strand    sample1_indexUTR        sample2_indexUTR          sample3_indexUTR
-AACS%%3:+::chr12:125142091-125142380    289     AACS%%3         125142091       125142380     +         0.6331098039907349      0.8141000731552296        0.6945178987151257
-AAMP%%1:-::chr2:218264128-218264608     480     AAMP%%1         218264128       218264608     -         0.9140432121116838      0.9762385375962184        0.9821115355165274
-...
+python process_last.py \
+  --input_file <PAS_BED> \
+  --output_file final_site_for_quantification.bed
 ```
+
+* Use `pas_site.bed` for a single group.
+* Use `combind_pas_site.bed` for multiple groups.
+
+---
+
+**High-confidence APA sites (BED) example:**
+
+```
+# chr   start     end       cluster_size  gene%%transcript  strand
+chr1   944201    944201    4             NOC2L%%1          -
+chr1   965721    965721    2             KLHL17%%1         +
+…
+```
+
+---
+
+### 3. Quantify with Salmon
+
+#### 3.1 Build Salmon index
+
+Options for `get_salmon_index.sh`:
+
+| Flag | Description                                               |
+| ---- | --------------------------------------------------------- |
+| `-f` | final\_site\_for\_quantification.bed                      |
+| `-u` | RefSeq\_UTR\_final.bed                                    |
+| `-l` | refseq\_last\_exon.bed                                    |
+| `-g` | UCSC\_hg38.fa                                             |
+| `-o` | Output FASTA for 3′ UTR isoforms (e.g. `3UTRisoforms.fa`) |
+| `-i` | Salmon index directory (e.g. `3UTRisoforms_library`)      |
+
+**Example:**
+
+```bash
+./get_salmon_index.sh \
+  -f final_site_for_quantification.bed \
+  -u RefSeq_UTR_final.bed \
+  -l refseq_last_exon.bed \
+  -g hg38.fa \
+  -o 3UTRisoforms.fa \
+  -i 3UTRisoforms_library
+```
+
+---
+
+#### 3.2 Quantification
+
+Options for `get_quant.sh`:
+
+| Flag | Description                                 |
+| ---- | ------------------------------------------- |
+| `-i` | Salmon index directory                      |
+| `-d` | Directory of input FASTQ files              |
+| `-o` | Output directory for quantification results |
+
+**Example:**
+
+```bash
+./get_quant.sh \
+  -i 3UTRisoforms_library \
+  -d fastq_directory \
+  -o quant_results
+```
+
+---
+
+#### 3.3 Merge quantification across samples
+
+Options for `merge_quant.sh`:
+
+```bash
+merge_quant.sh \
+  -l sample_list.txt \
+  -b /path/to/quant_results \
+  -o merged_tpm.txt
+```
+
+* `sample_list.txt`: one sample directory per line
+* `-b`: base directory containing each sample’s results
+
+---
+
+### 4. Assemble Final Data Matrix
+
+Options for `get_final_result.py`:
+
+| Flag            | Description                          |
+| --------------- | ------------------------------------ |
+| `--group_files` | Paths to sample-group text files     |
+| `--merge_file`  | Path to `merged_tpm.txt`             |
+| `--output_dir`  | Directory to save the final matrices |
+| `--length`      | Minimum 3′ UTR length to include     |
+
+**Example:**
+
+```bash
+python get_final_result.py \
+  --group_files group_A.txt group_B.txt \
+  --merge_file merged_tpm.txt \
+  --output_dir final_result \
+  --length 100
+```
+
+---
+
+#### Final 3UTR index example
+
+```
+# Name                                     Length  Transcript  start       end         strand  sample1_indexUTR  sample2_indexUTR  sample3_indexUTR
+AACS%%3:+::chr12:125142091-125142380      289     AACS%%3      125142091   125142380   +       0.6331            0.8141            0.6945
+…
+```
+
+---
+
+*All scripts and parameters are fully customizable. For questions or issues, please open an issue on the project repository.*
