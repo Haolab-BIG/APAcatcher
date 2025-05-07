@@ -89,9 +89,8 @@ chr1    1216930   1216930   2                     SDF4%%1               -
 
 ```bash
 #3.1 build salmon index
+./get_salmon_index.sh -f <final_site_bed> -r <refseq_utr_bed> -l <refseq_last_bed> -g <hg38_fa> -o <output_fa> -i <output_index>
 
-./get_salmon_index.sh /final_site_for_quantification.bed /RefSeq_UTR_final.bed /RefSeq_UTR_lastexon_final.bed /hg38.fa \
-/quant_result/3UTRisoforms_sequences.fa /quant_result/3UTRisoforms_library
 
 #3.2 quantification
 ./get_quant.sh 3UTRisoforms_library clean_fastq_dir quant_result_dir
