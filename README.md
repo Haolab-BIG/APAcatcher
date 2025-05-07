@@ -148,8 +148,8 @@ merge_quant.sh -l sample_list.txt -b /data/quant -o merged_tpm.txt
 The options for get final result
 ```bash
 --group_files             Paths to multiple sample group files(.txt)
---merge_file              Path to merged quantification file
---output_dir              Directory to save output CSV files
+--merge_file              Path to merged quantification file(.txt)
+--output_dir              Directory to save output txt files
 --length                  Filter by minimum length
 ```
 Example of group_files
