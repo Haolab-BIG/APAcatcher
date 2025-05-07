@@ -65,10 +65,7 @@ def main(input_file, genome_file, output_file, tpm_threshold, length_threshold, 
     model.load_state_dict(torch.load('/mnt/pengc/APA_project/alogrithm/APA_new_best_model.pth', map_location=torch.device('cpu')))
     filtered_sequences = filter_sequences_with_model(sequences, model, max_len=201)
     # Step 4: Combine and write final output
-    #df = pd.DataFrame(results, columns=["chrom", "start", "end", "sequence","gene", "strand"])
     output_file_path = os.path.join(output_file, f"{os.path.basename(input_file).replace('.txt', '_output.bed')}")
-    #drop_output_file_path = os.path.join(output_file, f"{os.path.basename(input_file).replace('.txt', '_output_drop.bed')}")
-    #drop_sequences.to_csv(drop_output_file_path, sep='\t', header=False, index=False)
     combine_and_write_final_output(filtered_sequences, retained_positions, output_file_path)
     logging.info("Main process completed.")
 
