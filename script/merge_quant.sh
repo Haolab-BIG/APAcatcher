@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # ====================================================
-# SCRIPT: tpm_matrix_merger.sh
+# Author: [ChengPeng]
+# SCRIPT: merge_quant.sh
 # DESCRIPTION: Merge TPM columns from multiple Salmon quant.sf files
-# USAGE: ./tpm_matrix_merger.sh [OPTIONS] -l SAMPLE_LIST -b BASE_DIR -o OUTPUT_FILE
+# USAGE: ./merge_quant.sh [OPTIONS] -l SAMPLE_LIST -b BASE_DIR -o OUTPUT_FILE
 # ====================================================
 
 set -euo pipefail
