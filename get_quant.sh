@@ -1,197 +1,79 @@
 #!/bin/bash
 
-# ====================================================
-# SCRIPT: salmon_quantification.sh
-# DESCRIPTION: Perform RNA-seq quantification using Salmon
-# USAGE: ./salmon_quantification.sh -i INDEX -f FASTQ_DIR -o OUTPUT_DIR [OPTIONS]
-# ====================================================
+# Set script to exit on error
+set -e
 
-set -euo pipefail
-
-# Initialize configuration variables
-INDEX_PATH=""
-FASTQ_DIR=""
-OUTPUT_DIR=""
-THREADS=12
-OVERWRITE=false
-LOG_FILE="salmon_processing.log"
-EXTENSIONS=("fastq.gz" "fq.gz" "fastq" "fq")
-SCRIPT_NAME=$(basename "$0")
-
-# Display help information
+# Parse command line arguments with option flags
 usage() {
-    cat <<EOF
-${SCRIPT_NAME} - Salmon quantification pipeline
-
-USAGE:
-    ${SCRIPT_NAME} -i INDEX -f FASTQ_DIR -o OUTPUT_DIR [OPTIONS]
-
-REQUIRED PARAMETERS:
-    -i, --index          Path to Salmon index
-    -f, --fastq-dir      Directory containing FASTQ files
-    -o, --output-dir     Output directory for quantification results
-
-OPTIONS:
-    -t, --threads        Number of threads to use (default: 12)
-    -e, --extensions     Comma-separated file extensions to process
-                        (default: fastq.gz,fq.gz,fastq,fq)
-    -l, --log-file       Path to log file (default: salmon_processing.log)
-    --overwrite          Overwrite existing output directories
-    -h, --help           Show this help message
-
-EXAMPLES:
-    Basic usage:
-    ${SCRIPT_NAME} -i /data/index -f /data/fastq -o /results
-
-    Custom extensions and threads:
-    ${SCRIPT_NAME} -i /data/index -f /data/fastq -o /results \\
-                   -t 16 -e "fastq.gz,fq"
-EOF
-}
-
-# Parse command-line arguments
-while [[ "$#" -gt 0 ]]; do
-    case $1 in
-        -i|--index)
-            INDEX_PATH="$2"
-            shift
-            ;;
-        -f|--fastq-dir)
-            FASTQ_DIR="$2"
-            shift
-            ;;
-        -o|--output-dir)
-            OUTPUT_DIR="$2"
-            shift
-            ;;
-        -t|--threads)
-            THREADS="$2"
-            shift
-            ;;
-        -e|--extensions)
-            IFS=',' read -ra EXTENSIONS <<< "$2"
-            shift
-            ;;
-        -l|--log-file)
-            LOG_FILE="$2"
-            shift
-            ;;
-        --overwrite)
-            OVERWRITE=true
-            ;;
-        -h|--help)
-            usage
-            exit 0
-            ;;
-        *)
-            echo "Error: Unknown parameter: $1" >&2
-            usage >&2
-            exit 1
-            ;;
-    esac
-    shift
-done
-
-# Validate required parameters
-check_path() {
-    if [[ -z "$1" ]]; then
-        echo "Error: Missing required parameter: $2" >&2
-        usage >&2
-        exit 1
-    fi
-    if [[ ! -e "$1" ]]; then
-        echo "Error: Path does not exist: $1" >&2
-        exit 1
-    fi
-}
-
-check_path "$INDEX_PATH" "index"
-check_path "$FASTQ_DIR" "fastq-dir"
-
-# Initialize output directory and logging
-mkdir -p "$OUTPUT_DIR" || {
-    echo "Error: Failed to create output directory" >&2
+    echo "Usage: $0 -i <index_path> -d <fastq_directory> -o <output_directory>"
     exit 1
 }
 
-exec > >(tee -a "$LOG_FILE") 2>&1
+# Initialize variables
+index=""
+fastq_dir=""
+output_dir=""
+threads=12  # Default number of threads
 
-log() {
-    local level=$1
-    local message=$2
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [${level^^}] $message"
-}
-
-# File pair validation functions
-validate_file_pair() {
-    local ext=$1
-    local count=0
-    
-    while IFS= read -r -d $'\0' file; do
-        ((count++))
-        sample_name=$(basename "$file")
-        sample_name="${sample_name%%_1*}"
-        
-        local pair_pattern="${sample_name}_2${file#*_1}"
-        local pair_files=()
-        
-        while IFS= read -r -d $'\0' pf; do
-            pair_files+=("$pf")
-        done < <(find "$FASTQ_DIR" -maxdepth 1 -type f -name "$pair_pattern" -print0)
-
-        case ${#pair_files[@]} in
-            0)
-                log WARNING "Missing pair for $file"
-                ;;
-            1)
-                process_sample "$file" "${pair_files[0]}" "$sample_name"
-                ;;
-            *)
-                log ERROR "Multiple pair candidates found for $file"
-                ;;
-        esac
-    done < <(find "$FASTQ_DIR" -maxdepth 1 -type f -name "*_1*.$ext" -print0)
-}
-
-# Main processing function
-process_sample() {
-    local r1=$1
-    local r2=$2
-    local sample=$3
-    local out_dir="${OUTPUT_DIR}/${sample}"
-
-    if [[ -d "$out_dir" && "$OVERWRITE" == false ]]; then
-        log WARNING "Skipping existing sample: $sample (use --overwrite to force)"
-        return
-    fi
-
-    log INFO "Processing sample: $sample"
-    log DEBUG "R1: $r1 | R2: $r2"
-
-    mkdir -p "$out_dir"
-    
-    if salmon quant -i "$INDEX_PATH" -l IU \
-        -1 "$r1" -2 "$r2" \
-        -o "$out_dir" -p "$THREADS" \
-        --validateMappings --useEM
-    then
-        log INFO "Completed successfully: $sample"
-    else
-        log ERROR "Failed processing: $sample"
-        rm -rf "$out_dir"
-    fi
-}
-
-# Main execution flow
-log INFO "Starting Salmon quantification pipeline"
-log INFO "System configuration:"
-log INFO "  - CPU threads: $THREADS"
-log INFO "  - Input directory: $FASTQ_DIR"
-log INFO "  - Output directory: $OUTPUT_DIR"
-
-for ext in "${EXTENSIONS[@]}"; do
-    log INFO "Processing files with extension: $ext"
-    validate_file_pair "$ext"
+# Parse command line options
+while getopts ":i:d:o:" opt; do
+    case $opt in
+        i) index="$OPTARG" ;;
+        d) fastq_dir="$OPTARG" ;;
+        o) output_dir="$OPTARG" ;;
+        \?) echo "Invalid option -$OPTARG" >&2; usage ;;
+        :) echo "Option -$OPTARG requires an argument." >&2; usage ;;
+    esac
 done
 
-log INFO "Processing completed successfully"
+# Validate required parameters
+if [[ -z "$index" || -z "$fastq_dir" || -z "$output_dir" ]]; then
+    echo "Missing required parameters"
+    usage
+fi
+
+# Check if output directory exists, create if not
+if [[ ! -d "$output_dir" ]]; then
+    echo "Output directory does not exist. Creating directory: $output_dir"
+    mkdir -p "$output_dir"
+fi
+
+# Supported FASTQ file extensions
+extensions=("fastq.gz" "fq.gz" "fastq" "fq")
+
+# Process paired-end FASTQ files
+for ext in "${extensions[@]}"; do
+    for file1 in "$fastq_dir"/*_1*."$ext"; do
+        # Skip if file does not exist
+        if [[ ! -e "$file1" ]]; then
+            continue
+        fi
+
+        # Extract sample name by removing _1 and extension
+        sample_name=$(basename "$file1")
+        sample_name="${sample_name%%_1*}"
+        echo "$sample_name"
+
+        # Find corresponding R2 file using wildcard match
+        file2=$(find "$fastq_dir" -maxdepth 1 -type f -name "${sample_name}_2*.$ext")
+        
+        if [[ -z "$file2" ]]; then
+            echo "$(date '+%Y-%m-%d %H:%M:%S') - Warning: Pair file for $file1 not found!"
+            continue
+        fi
+
+        echo "$(date '+%Y-%m-%d %H:%M:%S') - Starting processing for sample: $sample_name"
+
+        # Run Salmon quantification
+        salmon quant -i "$index" -l IU -1 "$file1" -2 "$file2" \
+        -o "${output_dir}/${sample_name}" -p "$threads" --validateMappings --useEM
+
+        if [[ $? -eq 0 ]]; then
+            echo "$(date '+%Y-%m-%d %H:%M:%S') - Completed processing for sample: $sample_name"
+        else
+            echo "$(date '+%Y-%m-%d %H:%M:%S') - Error occurred while processing sample: $sample_name"
+        fi
+    done
+done
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') - All samples processed."
