@@ -127,7 +127,7 @@ Options for `combind.sh`:
 | `-o`                | Output directory               |         |
 | `-d MERGE_DISTANCE` | Merge distance (bp)            | `70`    |
 
-**Example (single group):**
+**Example:**
 
 ```bash
 ./combind.sh \
@@ -140,7 +140,10 @@ Options for `combind.sh`:
 #### 2.4 Remove annotated-proximal sites
 
 Options for `process_last.py`:
-
+| Flag                | Description                              | Default |
+| ------------------- | -----------------------------------------| ------- |
+| `--input_file`      | single group or mulitiple group BED file |         |
+| `--output_file`     | Output directory                         |         |
 ```bash
 python process_last.py \
   --input_file <PAS_BED> \
