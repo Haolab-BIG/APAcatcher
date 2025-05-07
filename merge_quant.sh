@@ -1,51 +1,189 @@
 #!/bin/bash
 
-if [ $# -ne 3 ]; then
-    echo "Usage: $0 <folder1_list.txt> <base_directory> <output.txt>" 
-    exit 1
-fi
+# ====================================================
+# SCRIPT: tpm_matrix_merger.sh
+# DESCRIPTION: Merge TPM columns from multiple Salmon quant.sf files
+# USAGE: ./tpm_matrix_merger.sh [OPTIONS] -l SAMPLE_LIST -b BASE_DIR -o OUTPUT_FILE
+# ====================================================
 
-folder_list_file="$1"
-base_dir="$2"
-output_file="$3"
+set -eo pipefail
 
-if [ ! -f "$folder_list_file" ]; then
-    echo "File $folder_list_file does not exist."
-    exit 1
-fi
+# Configuration
+TEMP_FILES=()
+SCRIPT_NAME=$(basename "$0")
 
-if [ ! -d "$base_dir" ]; then
-    echo "Directory $base_dir does not exist."
-    exit 1
-fi
+# Initialize parameters
+SAMPLE_LIST=""
+BASE_DIR=""
+OUTPUT_FILE=""
+KEEP_TEMP=false
 
-first_folder=$(head -n 1 "$folder_list_file" | tr -d '\r\n')  # 去掉回车符和换行符
-if [ -d "$base_dir/$first_folder" ]; then
-    awk 'BEGIN {FS=OFS="\t"} {print $1, $2, $3}' "$base_dir/$first_folder/quant.sf" > merge.txt
-else
-    echo "Error: First directory $base_dir/$first_folder does not exist."
-    exit 1
-fi
-
-while IFS= read -r folder_name; do
-    folder_name=$(echo "$folder_name" | tr -d '\r\n') 
-    folder_path="$base_dir/$folder_name"
-
-    if [ -d "$folder_path" ]; then
-        column_name="${folder_name}_TPM"
-        
-
-        awk -v col="$column_name" 'BEGIN {FS=OFS="\t"} NR==1 {print col} NR>1 {print $4}' "$folder_path/quant.sf" > "${folder_name}_col4.txt"
-
-        paste merge.txt "${folder_name}_col4.txt" > merge_temp.txt
-        mv merge_temp.txt merge.txt
-        
-        rm "${folder_name}_col4.txt"
-    else
-        echo "Warning: Directory $folder_path does not exist. Skipping."
+# Cleanup handler
+cleanup() {
+    if [[ "$KEEP_TEMP" == false ]]; then
+        for file in "${TEMP_FILES[@]}"; do
+            [[ -f "$file" ]] && rm -f "$file"
+        done
     fi
-done < "$folder_list_file"
+}
 
-mv merge.txt "$output_file"
-echo "Merging complete. Output written to $output_file."
+trap cleanup EXIT
 
+# Display help information
+show_usage() {
+    cat <<EOF
+${SCRIPT_NAME} - Salmon Quant Merge Utility
+
+USAGE:
+    ${SCRIPT_NAME} [OPTIONS] -l SAMPLE_LIST -b BASE_DIR -o OUTPUT_FILE
+
+MANDATORY ARGUMENTS:
+    -l, --sample-list    File containing list of sample directories
+    -b, --base-dir       Base directory containing sample folders
+    -o, --output         Merged output file path
+
+OPTIONS:
+    -k, --keep-temp      Keep intermediate temporary files
+    -h, --help           Show this help message
+    -v, --version        Display version information
+
+EXAMPLES:
+    Basic usage:
+    ${SCRIPT_NAME} -l sample_list.txt -b /data/quant -o merged_tpm.txt
+
+    Keep temporary files:
+    ${SCRIPT_NAME} -l samples.txt -b /path/to/quants -o matrix.txt --keep-temp
+EOF
+}
+
+# Parse command-line arguments
+parse_arguments() {
+    while [[ "$#" -gt 0 ]]; do
+        case $1 in
+            -l|--sample-list)
+                SAMPLE_LIST="$2"
+                shift
+                ;;
+            -b|--base-dir)
+                BASE_DIR="$2"
+                shift
+                ;;
+            -o|--output)
+                OUTPUT_FILE="$2"
+                shift
+                ;;
+            -k|--keep-temp)
+                KEEP_TEMP=true
+                ;;
+            -h|--help)
+                show_usage
+                exit 0
+                ;;
+            *)
+                echo "Error: Unknown parameter: $1" >&2
+                show_usage >&2
+                exit 1
+                ;;
+        esac
+        shift
+    done
+}
+
+# Validate input parameters
+validate_inputs() {
+    [[ -z "$SAMPLE_LIST" ]] && { echo "Error: Sample list required" >&2; exit 1; }
+    [[ -z "$BASE_DIR" ]] && { echo "Error: Base directory required" >&2; exit 1; }
+    [[ -z "$OUTPUT_FILE" ]] && { echo "Error: Output file required" >&2; exit 1; }
+
+    [[ -f "$SAMPLE_LIST" ]] || { echo "Error: Sample list not found: $SAMPLE_LIST" >&2; exit 1; }
+    [[ -d "$BASE_DIR" ]] || { echo "Error: Base directory not found: $BASE_DIR" >&2; exit 1; }
+}
+
+# Logging system
+log() {
+    local level=$1
+    local message=$2
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] [${level^^}] $message" >&2
+}
+
+# Core processing functions
+initialize_matrix() {
+    local first_sample=$(head -n 1 "$SAMPLE_LIST" | tr -d '\r\n')
+    local first_quant="${BASE_DIR}/${first_sample}/quant.sf"
+
+    [[ -d "${BASE_DIR}/${first_sample}" ]] || { 
+        log ERROR "Initial sample directory missing: ${BASE_DIR}/${first_sample}"
+        exit 1
+    }
+
+    [[ -f "$first_quant" ]] || {
+        log ERROR "Quant file missing: $first_quant"
+        exit 1
+    }
+
+    awk 'BEGIN {FS=OFS="\t"} {print $1, $2, $3}' "$first_quant" > merge.txt
+    TEMP_FILES+=("merge.txt")
+}
+
+merge_samples() {
+    while IFS= read -r sample; do
+        sample=$(echo "$sample" | tr -d '\r\n')
+        local sample_dir="${BASE_DIR}/${sample}"
+        local quant_file="${sample_dir}/quant.sf"
+        local tmp_column="${sample}_tpm.txt"
+
+        [[ -d "$sample_dir" ]] || {
+            log WARNING "Sample directory missing: $sample_dir"
+            continue
+        }
+
+        [[ -f "$quant_file" ]] || {
+            log WARNING "Quant file missing: $quant_file"
+            continue
+        }
+
+        log INFO "Processing sample: $sample"
+        
+        # Extract TPM column with header
+        awk -v col="${sample}_TPM" '
+            BEGIN {FS=OFS="\t"} 
+            NR == 1 {print col} 
+            NR > 1 {print $4}
+        ' "$quant_file" > "$tmp_column"
+        
+        # Validate column dimensions
+        local main_lines=$(wc -l < merge.txt)
+        local column_lines=$(wc -l < "$tmp_column")
+        
+        if [[ "$main_lines" -ne "$column_lines" ]]; then
+            log ERROR "Dimension mismatch: $sample (main: $main_lines vs column: $column_lines)"
+            rm "$tmp_column"
+            continue
+        fi
+
+        paste merge.txt "$tmp_column" > merge_temp.txt
+        mv merge_temp.txt merge.txt
+        rm "$tmp_column"
+        
+    done < "$SAMPLE_LIST"
+}
+
+# Main workflow
+main() {
+    parse_arguments "$@"
+    validate_inputs
+    
+    log INFO "Starting TPM matrix merge"
+    log INFO "System Configuration:"
+    log INFO "  Sample List: $SAMPLE_LIST"
+    log INFO "  Base Directory: $BASE_DIR"
+    log INFO "  Output File: $OUTPUT_FILE"
+
+    initialize_matrix
+    merge_samples
+
+    mv merge.txt "$OUTPUT_FILE"
+    log SUCCESS "Merge completed successfully. Output: $OUTPUT_FILE"
+}
+
+main "$@"
