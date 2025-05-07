@@ -147,13 +147,13 @@ merge_quant.sh -l sample_list.txt -b /data/quant -o merged_tpm.txt
 ### 4.get data matrix for downstream analysis
 The options for get final result
 ```bash
---group_files             Paths to multiple sample group files
+--group_files             Paths to multiple sample group files(.txt)
 --merge_file              Path to merged quantification file
 --output_dir              Directory to save output CSV files
 --length                  Filter by minimum length
 ```
 Example of group_files
-```bash
+```txt
 H1_s1
 H1_s2
 H1_s3
