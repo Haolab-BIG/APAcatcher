@@ -86,19 +86,33 @@ chr1    1216930   1216930   2                     SDF4%%1               -
 ...
 ```
 ### 3.using salmon to quantification
-
+#### 3.1 build salmon index
 ```bash
-#3.1 build salmon index
+
 ./get_salmon_index.sh -f <final_site_bed> -r <refseq_utr_bed> -l <refseq_last_bed> -g <hg38_fa> -o <output_fa> -i <output_index>
 
 
-#3.2 quantification
+```
+##### 3.2 quantification
+```bash
 ./get_quant.sh 3UTRisoforms_library clean_fastq_dir quant_result_dir
-#merge quant result from different sample
-./merge_quant.sh sample.txt quant_result_dir/final_quant_result.txt
-
 ```
 
+#### 3.3 merge quant result from different sample
+The options for merge quantification in different samples
+```bash
+USAGE:
+    merge_quant.sh [OPTIONS] -l SAMPLE_LIST -b BASE_DIR -o OUTPUT_FILE
+
+MANDATORY ARGUMENTS:
+    -l, --sample-list    File containing list of sample directories
+    -b, --base-dir       Base directory containing sample folders
+    -o, --output         Merged output file path
+```
+Example of merge quantification
+```bash
+merge_quant.sh -l sample_list.txt -b /data/quant -o merged_tpm.txt
+```
 ### 4.get data matrix for downstream analysis
 ```bash
 python get_final_result.py --group_files group_A.txt group_B.txt ... --merge_file final_quant_result.txt --output_dir final_result 
