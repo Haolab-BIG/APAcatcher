@@ -6,7 +6,7 @@
 # USAGE: ./salmon_quantification.sh -i INDEX -f FASTQ_DIR -o OUTPUT_DIR [OPTIONS]
 # ====================================================
 
-set -eo pipefail
+set -euo pipefail
 
 # Initialize configuration variables
 INDEX_PATH=""
