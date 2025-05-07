@@ -89,12 +89,12 @@ chr1    1216930   1216930   2                     SDF4%%1               -
 #### 3.1 build salmon index
 The options for build salmon index
 ```bash
--f FINAL_SITE_BED        Path to final_site.bed
+-f FINAL_SITE_BED        Path to final_site.bed(get from process_last.py)
 -u REFSEQ_UTR_BED        Path to RefSeq_UTR_final.bed
 -l REFSEQ_LAST_BED       Path to refseq_last_exon.bed
 -g HG38_FASTA            Path to UCSC_hg38.fa
--o OUTPUT_FASTA          Output FASTA filename for 3UTR isoforms
--i SAMPLON_INDEX_DIR     Output directory for Salmon index
+-o OUTPUT_FASTA          Output FASTA filename for 3UTR isoforms(3UTRisoforms.fa)
+-i SAMPLON_INDEX_DIR     Output directory for Salmon index(3UTRisoforms_library)
 ```
 Example
 ```
@@ -108,7 +108,7 @@ The options for salmon quantification
 -d FASTQ_DIR             input directory for fastq files
 -o OUTPUT_DIR            output directory for quantification result
 ```
-
+Example
 ```bash
 ./get_quant.sh -i <salmon_path> -d <fastq_directory> -o <output_directory>
 ```
@@ -129,6 +129,21 @@ Example of merge quantification
 merge_quant.sh -l sample_list.txt -b /data/quant -o merged_tpm.txt
 ```
 ### 4.get data matrix for downstream analysis
+The options for get final result
+```bash
+--group_files             Paths to multiple sample group files
+--merge_file              Path to merged quantification file
+--output_dir              Directory to save output CSV files
+--length                  Filter by minimum length
+```
+Example of group_files
+
+Example of merge_file(this is the output get from merge_quant.sh)
+
+
+
+
+Exapmle
 ```bash
 python get_final_result.py --group_files group_A.txt group_B.txt ... --merge_file final_quant_result.txt --output_dir final_result 
 ```
