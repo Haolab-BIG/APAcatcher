@@ -21,7 +21,7 @@ def combine_and_write_final_output(filtered_sequences, retained_positions, outpu
         if hasattr(filtered_sequences, 'to_csv'):
             filtered_sequences.to_csv(file, sep='\t', header=False, index=False)
         else:
-            logging.warning("filtered_sequences 不是一个 DataFrame。")
+            logging.warning("filtered_sequences is not a DataFrame。")
         for pos in retained_positions:
             writer.writerow(pos)
     logging.info("Final output written to file.")
