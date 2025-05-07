@@ -81,10 +81,10 @@ if __name__ == '__main__':
     parser.add_argument('--output_folder', required=True, help='Path to the output folder where results will be saved.')
 
     # Filtering and processing parameters
-    parser.add_argument('--tpm_threshold', type=int, required=True, help='Threshold for the tpm in gene data.')
-    parser.add_argument('--length_threshold', type=int, default=1, required=True, help='Threshold for the length of gene data.')
-    parser.add_argument('--penalty', type=float, required=True, help='Penalty value for change point detection.')
-    parser.add_argument('--min_size', type=int, required=True, help='Minimum size for change point detection.')
+    parser.add_argument('--tpm_threshold', type=int, default=1, help='Threshold for the tpm.')
+    parser.add_argument('--length_threshold', type=int, default=100, required=True, help='Threshold for the length of 3'UTR.')
+    parser.add_argument('--penalty', type=float, default=50, help='Penalty value for change point detection.')
+    parser.add_argument('--min_size', type=int, default=30, help='Minimum size for change point detection.')
     parser.add_argument('--num_processes', type=int, default=4, help='Number of parallel processes to use.')
     parser.add_argument('--flanking_bp', type=int, default=100, help='Number of flanking base pairs for sequence extraction.')
 
