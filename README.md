@@ -25,9 +25,9 @@ chr1    70013   0
 chr1    70014   0
 ...
 ```
-add gene%%transcript based on RefSeq_UTR_final.bed
+First you need add gene%%transcript based on RefSeq_UTR_final.bed
 ```bash
-python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir -p 8
+python add_geneinfo.py -g RefSeq_UTR_final.bed -d depth_file_dir
 ```
 Example of input files
 ```bash
@@ -47,8 +47,8 @@ The options for running APAcatcher for PAS identification
 --input_folder                  'Path to the input folder containing .txt files.'
 --genome_file                   'Path to the genome fasta file.'
 --output_folder                 'Path to the output folder where results will be saved.'
---tpm_threshold     default=1   'Threshold for the tpm in gene data.'
---length_threshold  default=100 'Threshold for the length of gene data.'
+--tpm_threshold     default=1   'Threshold for the tpm.'
+--length_threshold  default=100 'Threshold for the length of 3'UTR.'
 --penalty           default=50  'Penalty value for change point detection.'
 --min_size          default=30  'Minimum size for change point detection.'
 --num_processes     default=4   'Number of parallel processes to use'
@@ -65,7 +65,7 @@ python main.py --input_folder depth_file_dir --genome_file hg38.fa --output_fold
 
 #2.3 combind the sites obtained from different groups.
 #if you only have one group pass this command
-./combind.sh high_confidence_pas_folder high_confidence_pas_folder/combind_pas_site.bed
+./combind.sh -i high_confidence_pas_folder high_confidence_pas_folder/combind_pas_site.bed
 
 #2.4 Remove sites located within 100 bp of annotated sites.
 #if you only have one group use this bed file
