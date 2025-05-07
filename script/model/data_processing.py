@@ -13,7 +13,7 @@ from collections import defaultdict
 
 
 
-# 定义自定义的 Poisson 损失函数
+
 class PoissonLoss(BaseCost):
     model = ""
 
@@ -30,11 +30,10 @@ class PoissonLoss(BaseCost):
         return -np.sum(segment * np.log(mean + 1e-10) - mean + 1e-10)
 
 
-# 读取并过滤基因数据
 def group_and_filter_by_gene(input_file, tmp_threshold):
     gene_dict = defaultdict(lambda: {"counts": [], "positions": [], "chromosome": "", "strand": ""})
     total_sum = 0
-    # 读取文件并按基因名分组
+
     with open(input_file, 'r') as f:
         reader = csv.reader(f, delimiter='\t')
         for row in reader:
@@ -59,7 +58,7 @@ def group_and_filter_by_gene(input_file, tmp_threshold):
     return sorted_filtered_gene_dict
 
 
-# 递归过滤变更点的函数
+
 def filter_change_points_recursively(cp, coverage, strand):
     while True:
         initial_cp_len = len(cp)
@@ -127,7 +126,6 @@ def filter_redundant_change_points(cp, coverage, strand):
                 i += 1
     return cp
 
-# 多进程处理基因
 def process_gene(gene, data, penalty, min_size, threshold=10):
     try:
         # Extract relevant data
