@@ -100,7 +100,7 @@ Example
 ```
 ./get_salmon_index.sh -f <final_site_bed> -r <refseq_utr_bed> -l <refseq_last_exon_bed> -g <hg38_fa> -o <output_fa> -i <output_index>
 ```
-##### 3.2 quantification
+#### 3.2 quantification
 The options for salmon quantification
 
 ```bash
