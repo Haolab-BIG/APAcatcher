@@ -65,7 +65,7 @@ def main(input_file, genome_file, output_file, tpm_threshold, length_threshold, 
     # Step 3: Filter sequences with model
     logging.info("Filtering sequences with the model.")
     model = PAS_CNN()
-    model.load_state_dict(torch.load('/mnt/pengc/APA_project/alogrithm/APA_new_best_model.pth', map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load('model.pth', map_location=torch.device('cpu')))
     filtered_sequences = filter_sequences_with_model(sequences, model, max_len=201)
     # Step 4: Combine and write final output
     output_file_path = os.path.join(output_file, f"{os.path.basename(input_file).replace('.txt', '_output.bed')}")
