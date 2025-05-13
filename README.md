@@ -26,6 +26,16 @@ pip install \
 > **Note:** The script has been tested with Python 3.8.18.
 
 ---
+## Bam to depth file
+APAcatcher using depth file as input
+```
+# extract reads in 3’UTR regions
+samtools view -hb -L RefSeq_UTR_final.bed sample1.bam > sample1_3UTR.bam
+
+
+# convert bam to depth.txt
+samtools depth sample1_3UTR.bam -b RefSeq_UTR_final.bed > sample1_3UTR_read_coverage.txt
+```
 
 ## Usage Overview
 
