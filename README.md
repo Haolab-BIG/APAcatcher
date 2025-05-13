@@ -64,7 +64,7 @@ First, annotate each depth file with gene%%transcript and strand information (ba
 ```bash
 python add_geneinfo.py \
   -g RefSeq_UTR_final.bed \
-  -d depth_file_dir
+  -d input_depth_file_dir
 ```
 
 #### Annotated depth file example
