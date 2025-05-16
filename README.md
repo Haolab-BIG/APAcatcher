@@ -187,7 +187,7 @@ Options for `get_salmon_index.sh`:
 | ---- | --------------------------------------------------------- |
 | `-f` | final\_site\_for\_quantification.bed                      |
 | `-u` | RefSeq\_UTR\_final.bed                                    |
-| `-l` | refseq\_last\_exon.bed                                    |
+| `-l` | RefSeq\_UTR\_lastexon\_final.bed                          |
 | `-g` | UCSC\_hg38.fa                                             |
 | `-o` | Output FASTA for 3′ UTR isoforms (e.g. `3UTRisoforms.fa`) |
 | `-i` | Salmon index directory (e.g. `3UTRisoforms_library`)      |
@@ -198,7 +198,7 @@ Options for `get_salmon_index.sh`:
 ./get_salmon_index.sh \
   -f final_site_for_quantification.bed \
   -u RefSeq_UTR_final.bed \
-  -l refseq_last_exon.bed \
+  -l RefSeq_UTR_lastexon_final.bed \
   -g hg38.fa \
   -o 3UTRisoforms.fa \
   -i 3UTRisoforms_library
