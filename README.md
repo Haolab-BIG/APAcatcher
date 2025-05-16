@@ -20,6 +20,7 @@ pip install \
   torch==2.2.1 \
   ruptures==1.1.9 \
   biopython==1.83 \
+  einops==0.8.0 \
   tqdm==4.66.5
 ```
 
