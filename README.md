@@ -129,7 +129,7 @@ Options for `cluster_bed_files.sh`:
 ---
 
 #### 2.3 Inter-group merging
-
+if you only have one sample，pass this command
 Options for `combind.sh`:
 
 | Flag                | Description                    | Default |
