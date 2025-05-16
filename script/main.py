@@ -65,7 +65,9 @@ def main(input_file, genome_file, output_file, tpm_threshold, length_threshold, 
     # Step 3: Filter sequences with model
     logging.info("Filtering sequences with the model.")
     model = PAS_CNN()
-    model.load_state_dict(torch.load('model.pth', map_location=torch.device('cpu')))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    model_path = os.path.join(script_dir, 'model.pth')
+    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     filtered_sequences = filter_sequences_with_model(sequences, model, max_len=201)
     # Step 4: Combine and write final output
     output_file_path = os.path.join(output_file, f"{os.path.basename(input_file).replace('.txt', '_output.bed')}")
