@@ -154,12 +154,12 @@ Options for `combind.sh`:
 Options for `process_last.py`:
 | Flag                | Description                              | Default |
 | ------------------- | -----------------------------------------| ------- |
-| `--input_file`      | single group or mulitiple group BED file |         |
-| `--output_file`     | Output directory                         |         |
+| `--input`      | single group or mulitiple group BED file |         |
+| `--output`     | Output directory                         |         |
 ```bash
 python process_last.py \
-  --input_file <PAS_BED> \
-  --output_file final_site_for_quantification.bed
+  --input <PAS_BED> \
+  --output final_site_for_quantification.bed
 ```
 
 * Use `pas_site.bed` for a single group.
@@ -187,7 +187,7 @@ Options for `get_salmon_index.sh`:
 | Flag | Description                                               |
 | ---- | --------------------------------------------------------- |
 | `-f` | final\_site\_for\_quantification.bed                      |
-| `-u` | RefSeq\_UTR\_final.bed                                    |
+| `-r` | RefSeq\_UTR\_final.bed                                    |
 | `-l` | RefSeq\_UTR\_lastexon\_final.bed                          |
 | `-g` | UCSC\_hg38.fa                                             |
 | `-o` | Output FASTA for 3′ UTR isoforms (e.g. `3UTRisoforms.fa`) |
