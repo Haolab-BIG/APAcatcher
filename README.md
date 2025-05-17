@@ -198,7 +198,7 @@ Options for `get_salmon_index.sh`:
 ```bash
 ./get_salmon_index.sh \
   -f final_site_for_quantification.bed \
-  -u RefSeq_UTR_final.bed \
+  -r RefSeq_UTR_final.bed \
   -l RefSeq_UTR_lastexon_final.bed \
   -g hg38.fa \
   -o 3UTRisoforms.fa \
