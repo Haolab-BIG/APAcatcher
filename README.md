@@ -6,7 +6,7 @@
 
 
 ## Installation
-No installation required — just clone the repository and run the script.  
+Typical install time on a "normal" desktop computer: < 2 minutes 
 We recommend creating a dedicated Conda environment:
 
 ```bash
