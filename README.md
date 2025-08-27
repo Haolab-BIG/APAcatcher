@@ -1,5 +1,9 @@
 
 # APAcatcher
+## System Requirements
+- Operating System: Linux / macOS / Windows
+- Hardware: No non-standard hardware required (runs on a standard laptop/desktop)
+
 
 ## Installation
 
