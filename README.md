@@ -50,7 +50,7 @@ APAcatcher operates in four main stages:
 2. **Identify high-confidence APA sites**
 3. **Quantify with Salmon**
 4. **Assemble the final data matrix**
-5. 
+
 ### Estimated Runtime per Stage(8 kernel)
 
 | Stage                                | Typical Runtime*             |
