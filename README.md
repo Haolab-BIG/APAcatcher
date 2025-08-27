@@ -4,7 +4,6 @@
 - Operating System: Linux / macOS / Windows
 - Hardware: No non-standard hardware required (runs on a standard laptop/desktop)
 
-
 ## Installation
 Typical install time on a "normal" desktop computer: about 10 minutes
 
@@ -51,7 +50,17 @@ APAcatcher operates in four main stages:
 2. **Identify high-confidence APA sites**
 3. **Quantify with Salmon**
 4. **Assemble the final data matrix**
+5. 
+### Estimated Runtime per Stage(8 kernel)
 
+| Stage                                | Typical Runtime*             |
+|--------------------------------------|------------------------------|
+| Generate input files                 | ~5 min                       |
+| Identify high-confidence APA sites   | ~12 min                      |
+| Quantify with Salmon                 | ~20-30 min                   |
+| Assemble the final data matrix       | ~5-10 min                    |
+
+\* Runtime estimates vary depending on dataset size, sequencing depth, and available computing resources.
 ---
 
 ### 1. Generate Input Files
