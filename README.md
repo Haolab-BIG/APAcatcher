@@ -51,7 +51,7 @@ APAcatcher operates in four main stages:
 3. **Quantify with Salmon**
 4. **Assemble the final data matrix**
 
-Estimated Runtime per Stage (~30M reads,8 kernel)
+Estimated Runtime per Stage (~30M reads, 8 kernel)
 
 | Stage                                | Typical Runtime*             |
 |--------------------------------------|------------------------------|
