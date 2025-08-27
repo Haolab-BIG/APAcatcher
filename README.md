@@ -51,7 +51,7 @@ APAcatcher operates in four main stages:
 3. **Quantify with Salmon**
 4. **Assemble the final data matrix**
 
-### Estimated Runtime per Stage(8 kernel)
+Estimated Runtime per Stage (26M reads,8 kernel)
 
 | Stage                                | Typical Runtime*             |
 |--------------------------------------|------------------------------|
@@ -60,7 +60,8 @@ APAcatcher operates in four main stages:
 | Quantify with Salmon                 | ~20-30 min                   |
 | Assemble the final data matrix       | ~5-10 min                    |
 
-\* Runtime estimates vary depending on dataset size, sequencing depth, and available computing resources.
+Runtime estimates vary depending on dataset size, sequencing depth, and available computing resources.
+
 ---
 
 ### 1. Generate Input Files
