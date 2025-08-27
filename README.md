@@ -6,7 +6,7 @@
 
 
 ## Installation
-
+No installation required — just clone the repository and run the script.  
 We recommend creating a dedicated Conda environment:
 
 ```bash
