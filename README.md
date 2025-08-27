@@ -32,7 +32,7 @@ pip install \
 > **Note:** The script has been tested with Python 3.8.18.
 
 ---
-## Bam to depth file
+## Preparation:Bam to depth file
 APAcatcher using depth file as input
 ```
 # extract reads in 3’UTR regions
