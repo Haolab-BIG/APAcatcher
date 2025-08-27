@@ -6,7 +6,7 @@
 
 
 ## Installation
-Typical install time on a "normal" desktop computer: < 2 minutes
+Typical install time on a "normal" desktop computer: < 10 minutes
 
 We recommend creating a dedicated Conda environment:
 
