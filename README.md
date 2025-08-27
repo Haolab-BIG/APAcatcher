@@ -75,7 +75,7 @@ chr1    70011   0
 …
 ```
 
-First, annotate each depth file with gene%%transcript and strand information (based on `RefSeq_UTR_final.bed`):
+First, annotate each depth file with gene%%transcript_number and strand information (based on `RefSeq_UTR_final.bed`):
 
 ```bash
 python add_geneinfo.py \
@@ -185,7 +185,7 @@ python process_last.py \
 **High-confidence APA sites (BED) example:**
 
 ```
-# chr   start     end       cluster_size  gene%%transcript  strand
+# chr   start     end       cluster_size  gene%%transcript_number  strand
 chr1   944201    944201    4             NOC2L%%1          -
 chr1   965721    965721    2             KLHL17%%1         +
 …
