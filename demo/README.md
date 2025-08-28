@@ -14,4 +14,3 @@ Files included:
 3. **RefSeq_UTR_lastexon_final.bed**  
    - BED file including both the last annotated exon and the corresponding 3′UTR for each RefSeq transcript.  
 
-All files are minimal examples provided for pipeline testing.  
