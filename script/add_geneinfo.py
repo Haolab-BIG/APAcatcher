@@ -48,7 +48,7 @@ def safe_write_csv(df, original_file):
         os.remove(tmp_file_name)
 
         # Remove original file after successful copy
-        os.remove(original_file)
+        os.replace(tmp_file_name, original_file)
     except Exception as e:
         logging.error(f"Failed to replace file: {original_file}, Error: {e}")
         # Attempt to clean up temporary file if operation failed
