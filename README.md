@@ -74,7 +74,7 @@ chr1    70011   0
 …
 ```
 
-First, annotate each depth file with gene%%transcript_number and strand information (based on `RefSeq_UTR_final.bed`):
+First, annotate each depth file with gene%%transcript_number and strand information (based on RefSeq_UTR_final.bed, please see the detailed information from the README.md in the “demo” file):
 
 ```bash
 python add_geneinfo.py \
