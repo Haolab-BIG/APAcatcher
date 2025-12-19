@@ -33,7 +33,7 @@ other_species/
 ├── Mouse/
 ├── Yeast/
 └── Zebrafish/
-
+```text
 ### File Descriptions
 
 Each species-specific folder contains three files:
