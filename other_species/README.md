@@ -68,8 +68,9 @@ Replace the path with the appropriate species folder and model file.
 
 ## Using BED Files
 For read depth extraction from BAM files (e.g., with samtools):
+
 ```bash
-samtools depth -b other_species/Arabidopsis/UTR_Arabidopsis.bed aligned.bam > depth.txt
+samtools depth sample1_3UTR.bam -b RefSeq_UTR_final.bed > sample1_3UTR_read_coverage.txt
 ```
 
 For Salmon index involving terminal exons:
