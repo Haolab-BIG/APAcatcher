@@ -18,7 +18,7 @@ def load_gene_info(gene_file):
     # Read BED file columns: chrom, start, end, gene_name, strand
     gene_df = pd.read_csv(gene_file, sep='\t', header=None, usecols=[0, 1, 2, 3, 5])
     gene_df.columns = ['chrom', 'start', 'end', 'gene_name', 'strand']
-
+    gene_df['chrom'] = gene_df['chrom'].astype(str)
     # Create dictionary mapping (chromosome, position) to (gene_name, strand)
     gene_info = {}
     for _, row in gene_df.iterrows():
@@ -33,21 +33,15 @@ def safe_write_csv(df, original_file):
     Safely write DataFrame to file using temporary file strategy to prevent data corruption.
     """
     try:
-        # Get system default temporary directory
         temp_dir = tempfile.gettempdir()
 
-        # Create temporary file in system temporary directory
         with tempfile.NamedTemporaryFile('w', dir=temp_dir, delete=False, suffix='.tmp') as tmpfile:
             tmp_file_name = tmpfile.name
             df.to_csv(tmp_file_name, sep='\t', header=False, index=False)
-
-        # Use secure file copy operation
         shutil.copy(tmp_file_name, original_file)
 
-        # Clean up temporary file
         os.remove(tmp_file_name)
 
-        # Remove original file after successful copy
         os.replace(tmp_file_name, original_file)
     except Exception as e:
         logging.error(f"Failed to replace file: {original_file}, Error: {e}")
@@ -62,24 +56,20 @@ def add_gene_info(data_file, gene_info):
     Annotate data file with gene information based on genomic coordinates.
     """
     try:
-        # Read data file with three required columns: chrom, pos, count
         data_df = pd.read_csv(data_file, sep='\t', header=None, names=['chrom', 'pos', 'count'])
+        data_df['chrom'] = data_df['chrom'].astype(str)
     except Exception as e:
         logging.error(f"Failed to read file: {data_file}, Error: {e}")
         return f"Error reading {data_file}: {e}"
 
-    # Create list of (chrom, pos) tuples for lookup
     keys = list(zip(data_df['chrom'], data_df['pos']))
     
-    # Get gene information for each position
     gene_names, strands = zip(*[gene_info.get(key, ("N/A", "N/A")) for key in keys])
 
-    # Add gene annotation columns
     data_df['gene_name'] = gene_names
     data_df['strand'] = strands
 
     try:
-        # Write updated data back to original file
         safe_write_csv(data_df, data_file)
     except Exception as e:
         return f"Error writing {data_file}: {e}"
@@ -98,7 +88,6 @@ def process_file(data_file, gene_info):
 
 
 def main():
-    """Main execution function"""
     parser = argparse.ArgumentParser(description='Annotate genomic data files with gene information')
     parser.add_argument('-g', '--gene_file', required=True, 
                         help='Path to gene annotation file in BED format')
