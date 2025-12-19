@@ -70,7 +70,8 @@ Replace the path with the appropriate species folder and model file.
 For read depth extraction from BAM files (e.g., with samtools):
 
 ```bash
-samtools depth sample1_3UTR.bam -b RefSeq_UTR_final.bed > sample1_3UTR_read_coverage.txt
+samtools view -hb -L UTR_[Species].bed sample1.bam > sample_3UTR.bam
+samtools depth sample_3UTR.bam -b UTR_[Species].bed > sample_3UTR_read_coverage.txt
 ```
 
 For Salmon index involving terminal exons:
