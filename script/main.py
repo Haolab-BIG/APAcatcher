@@ -62,15 +62,15 @@ def main(input_file, genome_file, output_file, tpm_threshold, length_threshold, 
     # Step 2: Extract sequences
     logging.info("Extracting sequences.")
 
-    sequences = extract_sequences_from_results(results, genome_file, flanking=flanking_bp)
-
     # Step 3: Filter sequences with model
     logging.info("Filtering sequences with the model.")
     if "Arabidopsis" in model_path:
+        sequences = extract_sequences_from_results(results, genome_file,flanking=flanking_bp,species="Arabidopsis")
         model = PAS_CNN_A()
         model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
         filtered_sequences = filter_sequences_with_model(sequences, model, max_len=301)
     else:
+        sequences = extract_sequences_from_results(results, genome_file,flanking=flanking_bp)
         model = PAS_CNN()
         model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
         filtered_sequences = filter_sequences_with_model(sequences, model, max_len=201)
@@ -104,4 +104,5 @@ if __name__ == '__main__':
             input_file_path = os.path.join(args.input_folder, file_name)
             main(input_file_path, args.genome_file, args.output_folder, args.tpm_threshold, args.length_threshold,
                  args.penalty, args.min_size, args.num_processes, args.flanking_bp,args.model_path)
+
 
