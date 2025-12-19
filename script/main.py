@@ -7,7 +7,7 @@ from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import csv
 import logging
-from model.model import PAS_CNN
+from model.model import PAS_CNN,PAS_CNN_A
 from model.data_processing import group_and_filter_by_gene, process_gene
 from model.sequence_extraction import extract_sequences_from_results
 from model.model_inference import filter_sequences_with_model
@@ -31,9 +31,10 @@ def combine_and_write_final_output(filtered_sequences, retained_positions, outpu
 
 
 def main(input_file, genome_file, output_file, tpm_threshold, length_threshold, penalty, min_size, num_processes,
-         flanking_bp):
+         flanking_bp,model_path):
     logging.info("Starting the main process.")
-
+    print(model_path)
+    print(min_size)
     # Step 1: Obtain results and retained_positions
     logging.info("Grouping and filtering genes.")
     filtered_gene_groups = group_and_filter_by_gene(input_file, tpm_threshold)
@@ -60,15 +61,19 @@ def main(input_file, genome_file, output_file, tpm_threshold, length_threshold, 
 
     # Step 2: Extract sequences
     logging.info("Extracting sequences.")
+
     sequences = extract_sequences_from_results(results, genome_file, flanking=flanking_bp)
 
     # Step 3: Filter sequences with model
     logging.info("Filtering sequences with the model.")
-    model = PAS_CNN()
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    model_path = os.path.join(script_dir, 'model.pth')
-    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-    filtered_sequences = filter_sequences_with_model(sequences, model, max_len=201)
+    if "Arabidopsis" in model_path:
+        model = PAS_CNN_A()
+        model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        filtered_sequences = filter_sequences_with_model(sequences, model, max_len=301)
+    else:
+        model = PAS_CNN()
+        model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        filtered_sequences = filter_sequences_with_model(sequences, model, max_len=201)
     # Step 4: Combine and write final output
     output_file_path = os.path.join(output_file, f"{os.path.basename(input_file).replace('.txt', '_output.bed')}")
     combine_and_write_final_output(filtered_sequences, retained_positions, output_file_path)
@@ -84,12 +89,12 @@ if __name__ == '__main__':
 
     # Filtering and processing parameters
     parser.add_argument('--tpm_threshold', type=int, default=1, help='Threshold for the tpm.')
-    parser.add_argument('--length_threshold', type=int, default=100, help="Threshold for the length of 3'UTR.")
+    parser.add_argument('--length_threshold', type=int, default=30, help="Threshold for the length of 3'UTR.")
     parser.add_argument('--penalty', type=float, default=50, help='Penalty value for change point detection.')
     parser.add_argument('--min_size', type=int, default=30, help='Minimum size for change point detection.')
     parser.add_argument('--num_processes', type=int, default=4, help='Number of parallel processes to use.')
     parser.add_argument('--flanking_bp', type=int, default=100, help='Number of flanking base pairs for sequence extraction.')
-
+    parser.add_argument('--model_path', type=str, default="model.pth", help='model.pth path')
     args = parser.parse_args()
 
     os.makedirs(args.output_folder, exist_ok=True)
@@ -98,5 +103,5 @@ if __name__ == '__main__':
         if file_name.endswith(".txt"):
             input_file_path = os.path.join(args.input_folder, file_name)
             main(input_file_path, args.genome_file, args.output_folder, args.tpm_threshold, args.length_threshold,
-                 args.penalty, args.min_size, args.num_processes, args.flanking_bp)
+                 args.penalty, args.min_size, args.num_processes, args.flanking_bp,args.model_path)
 
