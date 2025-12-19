@@ -41,7 +41,7 @@ def get_sequence_A(chromosome, start, strand, genome):
         return str(extracted_seq)
 
 
-def extract_sequences_from_results(results, genome_file, species, flanking=100):
+def extract_sequences_from_results(results, genome_file, flanking=100, species="Human"):
     genome = SeqIO.to_dict(SeqIO.parse(genome_file, "fasta"))
     sequences = []
     if species == "Arabidopsis":
@@ -56,3 +56,4 @@ def extract_sequences_from_results(results, genome_file, species, flanking=100):
             sequences.append([chromosome, start, end, gene, strand, extracted_seq])
     return sequences
     
+
