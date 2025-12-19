@@ -58,21 +58,26 @@ def main(input_file, genome_file, output_file, tpm_threshold, length_threshold, 
                     logging.info(f"Remaining genes: {all_genes}")
             except TimeoutError:
                 logging.warning("A process timed out and was skipped.")
+                
+    is_arabidopsis = "Arabidopsis" in model_path
+    species_config = {
+        "model_class": PAS_CNN_A if is_arabidopsis else PAS_CNN,
+        "max_len": 301 if is_arabidopsis else 201,
+        "extract_kwargs": {"species": "Arabidopsis"} if is_arabidopsis else {},
+        "name": "Arabidopsis" if is_arabidopsis else "Default"
+    }
 
-    if "Arabidopsis" in model_path:
-        logging.info("Extracting sequences.")
-        sequences = extract_sequences_from_results(results, genome_file,flanking=flanking_bp,species="Arabidopsis")
-        model = PAS_CNN_A()
-        model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-        logging.info("Filtering sequences with the model.")
-        filtered_sequences = filter_sequences_with_model(sequences, model, max_len=301)
-    else:
-        logging.info("Extracting sequences.")
-        sequences = extract_sequences_from_results(results, genome_file,flanking=flanking_bp)
-        model = PAS_CNN()
-        model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
-        logging.info("Filtering sequences with the model.")
-        filtered_sequences = filter_sequences_with_model(sequences, model, max_len=201)
+    logging.info("Extracting sequences.")
+    sequences = extract_sequences_from_results(
+        results, 
+        genome_file, 
+        flanking=flanking_bp, 
+        **species_config["extract_kwargs"]
+    )
+    model = species_config["model_class"]()
+    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+    logging.info("Filtering sequences with the model.")
+    filtered_sequences = filter_sequences_with_model(sequences, model, max_len=species_config["max_len"])
         
     output_file_path = os.path.join(output_file, f"{os.path.basename(input_file).replace('.txt', '_output.bed')}")
     combine_and_write_final_output(filtered_sequences, retained_positions, output_file_path)
@@ -103,6 +108,7 @@ if __name__ == '__main__':
             input_file_path = os.path.join(args.input_folder, file_name)
             main(input_file_path, args.genome_file, args.output_folder, args.tpm_threshold, args.length_threshold,
                  args.penalty, args.min_size, args.num_processes, args.flanking_bp,args.model_path)
+
 
 
 
