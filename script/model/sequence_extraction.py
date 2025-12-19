@@ -1,59 +1,71 @@
 # Author: [ChengPeng]
+import logging
 import pandas as pd
 from Bio import SeqIO
+from typing import Dict, List, Tuple
 
+def get_genomic_sequence(
+    chromosome: str, 
+    pos: int, 
+    strand: str, 
+    genome_dict: Dict, 
+    upstream: int = 100, 
+    downstream: int = 100
+) -> str:
+    
+    if chromosome not in genome_dict:
+        logging.warning(f"Chromosome {chromosome} not found in genome.")
+        return ""
 
-def get_sequence(chromosome, start, strand, genome, flanking=100):
-    seq = genome[chromosome].seq
-    start_pos = max(0, start - flanking)  # Ensure not to go out of bounds
-    end_pos = start + flanking  # Extract sequence from start position
-
-    extracted_seq = seq[start_pos:end_pos + 1]
-    if strand == '-':
-        return str(extracted_seq.reverse_complement())
-    else:
-        return str(extracted_seq)
-
-
-
-
-def get_sequence_A(chromosome, start, strand, genome):
+    seq_record = genome_dict[chromosome].seq
+    seq_len = len(seq_record)
 
     if strand == '+':
-        adj_start = start - 201
-        adj_end   = start + 100
-    else:  # strand == '-'
-        adj_start = start - 100
-        adj_end   = start + 201
+        start_pos = pos - upstream
+        end_pos = pos + downstream
+    else:
+        start_pos = pos - downstream
+        end_pos = pos + upstream
 
-    # Boundary protection
-    seq_record = genome[chromosome].seq
-    adj_start = max(0, adj_start)
-    adj_end = min(len(seq_record), adj_end)
+    start_final = max(0, start_final := start_pos)
+    end_final = min(seq_len, end_pos)
 
-    # Extract DNA sequence
-    extracted_seq = seq_record[adj_start:adj_end]
+    extracted_seq = seq_record[start_final:end_final]
 
-    # Reverse complement for negative strand
     if strand == '-':
         return str(extracted_seq.reverse_complement())
-    else:
-        return str(extracted_seq)
+    return str(extracted_seq)
 
 
-def extract_sequences_from_results(results, genome_file, flanking=100, species="Human"):
+def extract_sequences_from_results(
+    results: List[Tuple], 
+    genome_file: str, 
+    flanking: int = 100, 
+    species: str = "Default"
+) -> List[List]:
+    logging.info(f"Loading genome index from {genome_file}...")
     genome = SeqIO.to_dict(SeqIO.parse(genome_file, "fasta"))
-    sequences = []
-    if species == "Arabidopsis":
-        for result in results:
-            chromosome, start, end, _, gene, strand = result
-            extracted_seq = get_sequence_A(chromosome, start, strand, genome)
-            sequences.append([chromosome, start, end, gene, strand, extracted_seq])
-    else:
-        for result in results:
-            chromosome, start, end, _, gene, strand = result
-            extracted_seq = get_sequence(chromosome, start, strand, genome, flanking)
-            sequences.append([chromosome, start, end, gene, strand, extracted_seq])
-    return sequences
     
+    config = {
+        "Arabidopsis": {"up": 201, "down": 100},
+        "Default": {"up": flanking, "down": flanking}
+    }
+    
+    spec_cfg = config.get(species, config["Default"])
+    upstream_len = spec_cfg["up"]
+    downstream_len = spec_cfg["down"]
 
+    sequences = []
+    logging.info(f"Extracting sequences (Upstream:{upstream_len}, Downstream:{downstream_len})...")
+    for result in results:
+        chrom, start, end, _, gene, strand = result
+        
+        extracted_seq = get_genomic_sequence(
+            chrom, start, strand, genome, 
+            upstream=upstream_len, 
+            downstream=downstream_len
+        )
+        
+        sequences.append([chrom, start, end, gene, strand, extracted_seq])
+        
+    return sequences
