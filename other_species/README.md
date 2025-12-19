@@ -62,3 +62,23 @@ When running APAcatcher inference:
 
 ```bash
 python main.py --model_path other_species/Celegans/APAcatcher_Celegans.pth [other arguments...]
+```
+Replace the path with the appropriate species folder and model file.
+
+
+## Using BED Files
+For read depth extraction from BAM files (e.g., with samtools):
+```bash
+samtools depth -b other_species/Arabidopsis/UTR_Arabidopsis.bed aligned.bam > depth.txt
+```
+
+For Salmon index involving terminal exons:
+```bash
+./get_salmon_index.sh \
+  -f final_site_for_quantification.bed \
+  -r UTR_[Species].bed \
+  -l UTR_lastExon_[Species].bed \
+  -g species.fa \
+  -o 3UTRisoforms.fa \
+  -i 3UTRisoforms_library
+```
