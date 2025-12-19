@@ -107,26 +107,6 @@ def filter_change_points_around_well(cp, coverage, strand):
     return cp, coverage
 
 
-def filter_redundant_change_points(cp, coverage, strand):
-    i = 0
-    while i < len(cp) - 1:
-        start_index = max(0, cp[i] - 10)  
-        end_index = min(len(coverage), cp[i] + 10)  
-        
-        if strand == '+':
-            if ((sum(coverage[start_index:cp[i]]) // (cp[i] - start_index)) > 
-                (sum(coverage[cp[i]:end_index]) // (end_index - cp[i]))):
-                cp.pop(i)
-            else:
-                i += 1
-        else:
-            if ((sum(coverage[start_index:cp[i]]) // (cp[i] - start_index)) < 
-                (sum(coverage[cp[i]:end_index]) // (end_index - cp[i]))):
-                cp.pop(i)
-            else:
-                i += 1
-    return cp
-
 def process_gene(gene, data, penalty, min_size, threshold=10):
     try:
         # Extract relevant data
@@ -153,18 +133,15 @@ def process_gene(gene, data, penalty, min_size, threshold=10):
 
         # Filter change points
         
-        best_bkps_filtered_1, _ = filter_change_points_recursively(
+        best_bkps_filtered, _ = filter_change_points_recursively(
             best_bkps,
             [signal[i:j] for i, j in zip([0] + best_bkps[:-1], best_bkps)] + [signal[best_bkps[-1]:]],
             strand
         )
         
-        #best_bkps_filtered_2 = filter_redundant_change_points(best_bkps_filtered_1, signal, strand)
-        # Generate results and retained positions
-        
         results = []
         retained_positions = []
-        for bkp in best_bkps_filtered_1:
+        for bkp in best_bkps_filtered:
             if bkp < len(positions):
                 position = positions[bkp - 1]
                 if strand == '+':
@@ -185,3 +162,4 @@ def process_gene(gene, data, penalty, min_size, threshold=10):
     except Exception as e:
         print(f"Error processing gene {gene}: {e}")
         return [], []
+
