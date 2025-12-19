@@ -59,22 +59,21 @@ def main(input_file, genome_file, output_file, tpm_threshold, length_threshold, 
             except TimeoutError:
                 logging.warning("A process timed out and was skipped.")
 
-    # Step 2: Extract sequences
-    logging.info("Extracting sequences.")
-
-    # Step 3: Filter sequences with model
-    logging.info("Filtering sequences with the model.")
     if "Arabidopsis" in model_path:
+        logging.info("Extracting sequences.")
         sequences = extract_sequences_from_results(results, genome_file,flanking=flanking_bp,species="Arabidopsis")
         model = PAS_CNN_A()
         model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        logging.info("Filtering sequences with the model.")
         filtered_sequences = filter_sequences_with_model(sequences, model, max_len=301)
     else:
+        logging.info("Extracting sequences.")
         sequences = extract_sequences_from_results(results, genome_file,flanking=flanking_bp)
         model = PAS_CNN()
         model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+        logging.info("Filtering sequences with the model.")
         filtered_sequences = filter_sequences_with_model(sequences, model, max_len=201)
-    # Step 4: Combine and write final output
+        
     output_file_path = os.path.join(output_file, f"{os.path.basename(input_file).replace('.txt', '_output.bed')}")
     combine_and_write_final_output(filtered_sequences, retained_positions, output_file_path)
     logging.info("Main process completed.")
@@ -104,5 +103,6 @@ if __name__ == '__main__':
             input_file_path = os.path.join(args.input_folder, file_name)
             main(input_file_path, args.genome_file, args.output_folder, args.tpm_threshold, args.length_threshold,
                  args.penalty, args.min_size, args.num_processes, args.flanking_bp,args.model_path)
+
 
 
