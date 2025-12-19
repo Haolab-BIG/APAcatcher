@@ -5,12 +5,9 @@ from torch.utils.data import DataLoader, TensorDataset
 import torch.nn.functional as F
 import numpy as np
 
-import numpy as np
 
 def one_hot_encode(sequences, max_len=201):
-
     lookup = np.full((256, 4), 0.25, dtype=np.float32)
-
     lookup[ord('A')] = [1, 0, 0, 0]
     lookup[ord('C')] = [0, 1, 0, 0]
     lookup[ord('G')] = [0, 0, 1, 0]
@@ -71,4 +68,5 @@ def filter_sequences_with_model(sequences_info, model, max_len=201, device="cpu"
     filtered_df = df[df["label"] == 0].copy()
     result = filtered_df[["chrom", "start", "end", "score", "gene", "strand"]]
     return result
+
 
