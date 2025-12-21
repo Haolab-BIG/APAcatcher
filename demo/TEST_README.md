@@ -39,10 +39,10 @@ python main.py \
 ### 2.2 Intra-Group Clustering
 
 > Note: Samples must be organized into separate folders by experimental group.  
-> SRR5076687 belong to pre_IGF
-> SRR5076712 belong to post_IGF
-> SRR5076688 belong to pre_DGF
-> SRR5076713 belong to post_DGF
+> SRR5076687 belong to pre_IGF  
+> SRR5076712 belong to post_IGF  
+> SRR5076688 belong to pre_DGF  
+> SRR5076713 belong to post_DGF  
 
 ```bash
 for group in pre_IGF post_IGF pre_DGF post_DGF; do
