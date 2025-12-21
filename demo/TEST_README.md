@@ -39,12 +39,17 @@ python main.py \
 ### 2.2 Intra-Group Clustering
 
 > Note: Samples must be organized into separate folders by experimental group.  
-> SRR5076687 and SRR5076688 belong to Group_Pre  
-> SRR5076712 and SRR5076713 belong to Group_Post
+> SRR5076687 belong to pre_IGF
+> SRR5076712 belong to post_IGF
+> SRR5076688 belong to pre_DGF
+> SRR5076713 belong to post_DGF
 
 ```bash
-./cluster_bed_files.sh -i ./Sample_output/high_confidence_pas_folder/Group_Pre -o ./Sample_output/cluster_high_confidence_pas_folder
-./cluster_bed_files.sh -i ./Sample_output/high_confidence_pas_folder/Group_Post -o ./Sample_output/cluster_high_confidence_pas_folder
+for group in pre_IGF post_IGF pre_DGF post_DGF; do
+    ./cluster_bed_files.sh \
+        -i ./Sample_output/high_confidence_pas_folder/$group \
+        -o ./Sample_output/cluster_high_confidence_pas_folder
+done
 ```
 
 ### 2.3 Inter-Group Merging
