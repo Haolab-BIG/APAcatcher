@@ -34,11 +34,11 @@ pip install \
 APAcatcher using depth file as input
 ```
 # extract reads in 3’UTR regions
-samtools view -hb -L RefSeq_UTR_final.bed sample1.bam > sample1_3UTR.bam
+samtools view -hb -L UTR_Human.bed sample1.bam > sample1_3UTR.bam
 
 
 # convert bam to depth.txt
-samtools depth sample1_3UTR.bam -b RefSeq_UTR_final.bed > sample1_3UTR_read_coverage.txt
+samtools depth sample1_3UTR.bam -b UTR_Human.bed > sample1_3UTR_read_coverage.txt
 ```
 
 ## Usage Overview
@@ -78,7 +78,7 @@ First, annotate each depth file with gene%%transcript_number and strand informat
 
 ```bash
 python add_geneinfo.py \
-  -g RefSeq_UTR_final.bed \
+  -g UTR_Human.bed \
   -d input_depth_file_dir
 ```
 
@@ -201,8 +201,8 @@ Options for `get_salmon_index.sh`:
 | Flag | Description                                               |
 | ---- | --------------------------------------------------------- |
 | `-f` | final\_site\_for\_quantification.bed                      |
-| `-r` | RefSeq\_UTR\_final.bed                                    |
-| `-l` | RefSeq\_UTR\_lastexon\_final.bed                          |
+| `-r` | UTR\_Human.bed                                            |
+| `-l` | UTR\_lastexon\_Human.bed                                  |
 | `-g` | UCSC\_hg38.fa                                             |
 | `-o` | Output FASTA for 3′ UTR isoforms (e.g. `3UTRisoforms.fa`) |
 | `-i` | Salmon index directory (e.g. `3UTRisoforms_library`)      |
@@ -212,8 +212,8 @@ Options for `get_salmon_index.sh`:
 ```bash
 ./get_salmon_index.sh \
   -f final_site_for_quantification.bed \
-  -r RefSeq_UTR_final.bed \
-  -l RefSeq_UTR_lastexon_final.bed \
+  -r UTR_Human.bed \
+  -l UTR_lastExon_Human.bed \
   -g hg38.fa \
   -o 3UTRisoforms.fa \
   -i 3UTRisoforms_library
