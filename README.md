@@ -109,6 +109,7 @@ Options for `main.py`:
 | `--penalty`          | Penalty for change-point detection | `50`    |
 | `--min_size`         | Minimum segment size for PELT      | `30`    |
 | `--num_processes`    | Number of parallel workers         | `4`     |
+| `--model_path`       | Path to the pre-trained model for different species. The species (e.g., Human) is automatically inferred from the filename.         | `APAcatcher_Human.pth`     |
 
 **Example:**
 
