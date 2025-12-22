@@ -1,4 +1,4 @@
-# other_species
+# muti_species
 
 This directory contains **species-specific resources** for running **APAcatcher**, including  
 pre-trained deep learning models (PyTorch) and UTR annotation files required for RNA-seq
