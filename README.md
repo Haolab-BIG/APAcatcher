@@ -99,17 +99,17 @@ chr1    70011   0   OR4F5%%1    +
 
 Options for `main.py`:
 
-| Flag                 | Description                        | Default |
-| -------------------- | ---------------------------------- | ------- |
-| `--input_folder`     | Path to annotated depth files      |         |
-| `--genome_file`      | Reference genome FASTA             |         |
-| `--output_folder`    | Directory to save predicted PAS    |         |
-| `--tpm_threshold`    | Minimum TPM to consider            | `1`     |
-| `--length_threshold` | Minimum 3' UTR length (bp)         | `100`   |
-| `--penalty`          | Penalty for change-point detection | `50`    |
-| `--min_size`         | Minimum segment size for PELT      | `30`    |
-| `--num_processes`    | Number of parallel workers         | `4`     |
-| `--model_path`       | Path to the pre-trained model for different species. The species (e.g., Human) is automatically inferred from the filename.         | `APAcatcher_Human.pth`     |
+| Flag                  | Description                        | Default |
+| --------------------  | ---------------------------------- | ------- |
+| `--input_folder`      | Path to annotated depth files      |         |
+| `--genome_file`       | Reference genome FASTA             |         |
+| `--output_folder`     | Directory to save predicted PAS    |         |
+| `--tpm_threshold`     | Minimum TPM to consider            | `1`     |
+| `--length_threshold`  | Minimum 3' UTR length (bp)         | `100`   |
+| `--penalty`           | Penalty for change-point detection | `50`    |
+| `--min_size`          | Minimum segment size for PELT      | `30`    |
+| `--num_processes`     | Number of parallel workers         | `4`     |
+| `--model_path`        | Path to the pre-trained model for different species. The species (e.g., Human) is automatically inferred from the filename.         | `APAcatcher_Human.pth`     |
 
 **Example:**
 
