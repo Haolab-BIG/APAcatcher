@@ -7,7 +7,7 @@ quantification and downstream APA analysis.
 ## Supported Species
 
 - **Arabidopsis**
-- **Caenorhabditis elegans (Celegans)**
+- **Caenorhabditis elegans (C.elegans)**
 - **Drosophila**
 - **Mouse**
 - **Yeast**
@@ -25,7 +25,7 @@ other_species/
 │   ├── APAcatcher_Arabidopsis_301.pth
 │   ├── UTR_Arabidopsis.bed
 │   └── UTR_lastExon_Arabidopsis.bed
-├── Celegans/
+├── C.elegans/
 │   ├── APAcatcher_Celegans.pth
 │   ├── UTR_Celegans.bed
 │   └── UTR_lastExon_Celegans.bed
@@ -61,7 +61,7 @@ Each species-specific folder contains three files:
 When running APAcatcher inference:
 
 ```bash
-python main.py --model_path other_species/Celegans/APAcatcher_Celegans.pth [other arguments...]
+python main.py --model_path muti_species/C.elegans/APAcatcher_Celegans.pth [other arguments...]
 ```
 Replace the path with the appropriate species folder and model file.
 
