@@ -21,10 +21,10 @@ def get_genomic_sequence(
     seq_len = len(seq_record)
 
     if strand == '+':
-        start_pos = pos - upstream
+        start_pos = pos - upstream - 1
         end_pos = pos + downstream
     else:
-        start_pos = pos - downstream
+        start_pos = pos - downstream - 1
         end_pos = pos + upstream
 
     start_final = max(0, start_final := start_pos)
@@ -69,3 +69,4 @@ def extract_sequences_from_results(
         sequences.append([chrom, start, end, gene, strand, extracted_seq])
         
     return sequences
+
