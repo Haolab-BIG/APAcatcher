@@ -27,7 +27,7 @@ def get_genomic_sequence(
         start_pos = pos - downstream - 1
         end_pos = pos + upstream
 
-    start_final = max(0, start_final := start_pos)
+    start_final = max(0, start_pos)
     end_final = min(seq_len, end_pos)
 
     extracted_seq = seq_record[start_final:end_final]
@@ -69,4 +69,5 @@ def extract_sequences_from_results(
         sequences.append([chrom, start, end, gene, strand, extracted_seq])
         
     return sequences
+
 
