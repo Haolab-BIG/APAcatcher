@@ -12,7 +12,7 @@ quantification and downstream APA analysis.
 - **Mouse**
 - **Yeast**
 - **Zebrafish**
-
+- **Human**
 ---
 
 ## Directory Structure
