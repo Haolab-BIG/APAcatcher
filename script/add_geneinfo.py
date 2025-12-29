@@ -8,18 +8,12 @@ import pandas as pd
 import tempfile
 import shutil
 
-# Configure logging with timestamp and severity level
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def load_gene_info(gene_file):
-    """
-    Load gene information from BED-formatted file and create a position-to-gene mapping dictionary.
-    """
-    # Read BED file columns: chrom, start, end, gene_name, strand
     gene_df = pd.read_csv(gene_file, sep='\t', header=None, usecols=[0, 1, 2, 3, 5])
     gene_df.columns = ['chrom', 'start', 'end', 'gene_name', 'strand']
     gene_df['chrom'] = gene_df['chrom'].astype(str)
-    # Create dictionary mapping (chromosome, position) to (gene_name, strand)
     gene_info = {}
     for _, row in gene_df.iterrows():
         for pos in range(row['start'], row['end'] + 1):
@@ -29,9 +23,6 @@ def load_gene_info(gene_file):
 
 
 def safe_write_csv(df, original_file):
-    """
-    Safely write DataFrame to file using temporary file strategy to prevent data corruption.
-    """
     try:
         temp_dir = tempfile.gettempdir()
 
@@ -45,7 +36,6 @@ def safe_write_csv(df, original_file):
         os.replace(tmp_file_name, original_file)
     except Exception as e:
         logging.error(f"Failed to replace file: {original_file}, Error: {e}")
-        # Attempt to clean up temporary file if operation failed
         if 'tmp_file_name' in locals() and os.path.exists(tmp_file_name):
             os.remove(tmp_file_name)
         raise
@@ -108,8 +98,7 @@ def main():
     # Build gene position lookup table
     gene_info = load_gene_info(args.gene_file)
     logging.info("Gene information dictionary construction completed.")
-
-    # Process files in parallel with progress tracking
+    
     with ThreadPoolExecutor(max_workers=args.processes) as executor:
         futures = {executor.submit(process_file, f, gene_info): f for f in data_files}
 
