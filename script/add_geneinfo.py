@@ -23,21 +23,23 @@ def load_gene_info(gene_file):
 
 
 def safe_write_csv(df, original_file):
+    target_dir = os.path.dirname(os.path.abspath(original_file))
+    tmp_file_name = None
     try:
-        temp_dir = tempfile.gettempdir()
-
-        with tempfile.NamedTemporaryFile('w', dir=temp_dir, delete=False, suffix='.tmp') as tmpfile:
+        with tempfile.NamedTemporaryFile('w', dir=target_dir, delete=False, suffix='.tmp') as tmpfile:
             tmp_file_name = tmpfile.name
             df.to_csv(tmp_file_name, sep='\t', header=False, index=False)
-        shutil.copy(tmp_file_name, original_file)
-
-        os.remove(tmp_file_name)
+        
 
         os.replace(tmp_file_name, original_file)
+
     except Exception as e:
         logging.error(f"Failed to replace file: {original_file}, Error: {e}")
-        if 'tmp_file_name' in locals() and os.path.exists(tmp_file_name):
-            os.remove(tmp_file_name)
+        if tmp_file_name and os.path.exists(tmp_file_name):
+            try:
+                os.remove(tmp_file_name)
+            except OSError:
+                pass
         raise
 
 
