@@ -90,14 +90,12 @@ def main():
 
     args = parser.parse_args()
 
-    # Identify target data files with specific naming pattern
     data_files = [os.path.join(args.data_dir, filename) 
                  for filename in os.listdir(args.data_dir) 
                  if filename.endswith('.txt') and '_read_coverage' in filename]
     
     logging.info("Starting gene information dictionary construction.")
 
-    # Build gene position lookup table
     gene_info = load_gene_info(args.gene_file)
     logging.info("Gene information dictionary construction completed.")
     
