@@ -349,8 +349,8 @@ Options for `DE_analysis.py`:
 python DE_analysis.py \
   -t /final_result/TPM.txt \
   -i /final_result/3UTR_index.txt \
-  -a KO.txt \
-  -b WT.txt \
+  -a groupA.txt \
+  -b groupB.txt \
   -m index \
   -o KO_WT_index.txt
 ```
