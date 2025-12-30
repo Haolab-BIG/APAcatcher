@@ -226,7 +226,15 @@ Options for `get_salmon_index.sh`:
 ---
 
 #### 3.2 Quantification
+⚠️ FASTQ Naming Requirement
+Input FASTQ files must follow a paired-end naming convention so that the script can correctly match read pairs.
+Supported formats include, but are not limited to:
 
+sample1_R1.fastq.gz and sample1_R2.fastq.gz
+
+sample1_1.fastq.gz and sample1_2.fastq.gz
+
+Ensure that read pairs share the same sample prefix and differ only in the read identifier (R1/R2 or 1/2).
 Options for `get_quant.sh`:
 
 | Flag | Description                                 |
