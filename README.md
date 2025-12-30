@@ -326,13 +326,39 @@ python get_final_result.py \
 
 ---
 
-#### Final 3UTR index example
+#### Final 3′ UTR index example
 
-```
+```text
 # Name                                    Length  Transcript   start       end         strand    sample1_indexUTR  sample2_indexUTR  sample3_indexUTR
 AACS%%3:+::chr12:125142091-125142380      289     AACS%%3      125142091   125142380   +         0.6331            0.8141            0.6945
 …
 ```
+
+---
+
+#### Output files
+
+The `get_final_result.py` script generates the following output files in the specified output directory:
+
+- **`3UTR_averageLength.txt`**  
+  Average 3′ UTR length for each gene across samples, calculated based on isoform usage.
+
+- **`3UTR_usage.txt`**  
+  Relative usage of alternative 3′ UTR isoforms for each gene in each sample.
+
+- **`3UTR_index.txt`**  
+  Sample-wise 3′ UTR index values, representing the weighted average 3′ UTR length and serving as the primary input for downstream APA and differential analysis.
+
+- **`PDUI.txt`**  
+  Percentage of distal poly(A) site usage (PDUI) for each gene across samples.
+
+- **`PPUI.txt`**  
+  Percentage of proximal poly(A) site usage (PPUI), complementary to PDUI.
+
+- **`TPM.txt`**  
+  Transcript-level or isoform-level TPM matrix aggregated across all samples, used for downstream differential expression or APA-related analyses.
+
+All output files are tab-delimited.
 ### 5. DE analysis
 Options for `DE_analysis.py`:
 | Flag | Description                                            |
