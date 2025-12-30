@@ -289,7 +289,7 @@ python get_final_result.py \
 AACS%%3:+::chr12:125142091-125142380      289     AACS%%3      125142091   125142380   +         0.6331            0.8141            0.6945
 …
 ```
-
+### 5. Assemble Final Data Matrix
 ---
 
 *All scripts and parameters are fully customizable. For questions or issues, please open an issue on the project repository.*
