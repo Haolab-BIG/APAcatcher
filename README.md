@@ -254,7 +254,7 @@ Options for `get_quant.sh`:
 
 ---
 
-#### 3.3 Merge quantification across samples
+#### 3.3 Merge Quantification Across Samples
 
 Options for `merge_quant.sh`:
 
@@ -265,8 +265,19 @@ merge_quant.sh \
   -o merged_tpm.txt
 ```
 
-* `sample_list.txt`: one sample directory per line
-* `-b`: base directory containing each sample’s results
+* `sample_list.txt`: one sample directory per line  
+* `-b`: base directory containing each sample’s quantification results  
+
+📝 **Sample list format**  
+The `sample_list.txt` file should contain **one sample name per line**, corresponding to the sample prefix used in FASTQ file names and quantification output directories.
+
+For example, if your FASTQ files are named `sample1_R1.fastq.gz` / `sample1_R2.fastq.gz` (or `sample1_1.fastq.gz` / `sample1_2.fastq.gz`), the sample name should be:
+
+```text
+sample1
+sample2
+sample3
+```
 
 ---
 
@@ -274,12 +285,34 @@ merge_quant.sh \
 
 Options for `get_final_result.py`:
 
-| Flag            | Description                          |
-| --------------- | ------------------------------------ |
-| `--group_files` | Paths to sample-group text files     |
-| `--merge_file`  | Path to `merged_tpm.txt`             |
-| `--output_dir`  | Directory to save the final matrices |
-| `--length`      | Minimum 3′ UTR length to include     |
+| Flag            | Description                                   |
+| --------------- | --------------------------------------------- |
+| `--group_files` | Paths to sample group definition files        |
+| `--merge_file`  | Path to `merged_tpm.txt`                      |
+| `--output_dir`  | Directory to save the final matrices          |
+| `--length`      | Minimum 3′ UTR length to include              |
+
+🧩 **Group file format**  
+Each group file (e.g., `group_A.txt`, `group_B.txt`) should contain **one sample name per line**, matching the sample names defined in `sample_list.txt`.
+
+- `group_A.txt`: treatment / KO / case group samples  
+- `group_B.txt`: control / WT / reference group samples  
+
+Example:
+
+```text
+# group_A.txt (e.g., KO or treatment group)
+sample2
+sample4
+sample6
+```
+
+```text
+# group_B.txt (e.g., WT or control group)
+sample1
+sample3
+sample5
+```
 
 **Example:**
 
