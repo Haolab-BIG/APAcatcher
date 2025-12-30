@@ -311,9 +311,9 @@ python DE_analysis.py \
   -o KO_WT_index.txt
 ```
 **Notes**
-```
+---
 Ensure that sample names in Group_A and Group_B files are consistent with the column names in the TPM file.
-```
+
 ---
 
 *All scripts and parameters are fully customizable. For questions or issues, please open an issue on the project repository.*
