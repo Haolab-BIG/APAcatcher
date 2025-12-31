@@ -1,5 +1,6 @@
 
 # APAcatcher
+## Introduction
 ```txt
 Alternative polyadenylation (APA), a key post-transcriptional regulator affecting > 70% of human genes,
 generates mRNA isoforms with distinct 3’ ends. Despite its widespread biological importance, APA detection remains
