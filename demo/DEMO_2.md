@@ -113,8 +113,18 @@ python get_final_result.py \
 python DE_analysis.py \
   -t /final_result/TPM.txt \
   -i /final_result/3UTR_index.txt \
-  -a groupA.txt \
-  -b groupB.txt \
+  -a post_IGF.txt \
+  -b pre_IGF.txt \
   -m index \
-  -o KO_WT_index.txt
+  -o post_pre_IGF_index.txt
+
+
+
+python DE_analysis.py \
+  -t /final_result/TPM.txt \
+  -i /final_result/3UTR_index.txt \
+  -a post_DGF.txt \
+  -b pre_DGF.txt \
+  -m index \
+  -o post_pre_DGF_index.txt 
 ```
