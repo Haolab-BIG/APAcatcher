@@ -40,9 +40,9 @@ python main.py \
 
 > Note: Samples must be organized into separate folders by experimental group.  
 > SRR5076687 belong to pre_IGF  
-> SRR5076712 belong to post_IGF  
-> SRR5076688 belong to pre_DGF  
-> SRR5076713 belong to post_DGF  
+> SRR5076712 belong to post_IGF 
+> SRR5076688 belong to pre_DGF 
+> SRR5076713 belong to post_DGF
 
 ```bash
 for group in pre_IGF post_IGF pre_DGF post_DGF; do
@@ -55,7 +55,9 @@ done
 ### 2.3 Inter-Group Merging
 
 ```bash
-./combind.sh -i ./Sample_output/cluster_high_confidence_pas_folder -o ./Sample_output/cluster_high_confidence_pas_folder/combind
+./combind.sh
+-i absolute_path/Sample_output/cluster_high_confidence_pas_folder
+-o absolute_path/Sample_output/cluster_high_confidence_pas_folder/combind
 ```
 
 ### 2.4 Removal of Annotated-Proximal Sites
