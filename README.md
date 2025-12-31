@@ -379,11 +379,11 @@ The `get_final_result.py` script generates the following output files in the spe
 All output files are tab-delimited.
 
 ⚠️ **Data Preprocessing Note**:
-```txt
-In the generated .txt files, any original values recorded as 0 (which represent null or missing values)
-have been automatically converted to NA.This conversion is implemented to ensure data integrity
+
+In the generated .txt files, any original values recorded as **0** (which represent null or missing values)
+have been automatically converted to **NA**.This conversion is implemented to ensure data integrity
 and compatibility for subsequent statistical testing and differential expression analysis.
-```
+
 
 ### 5. DE analysis
 Options for `DE_analysis.py`:
