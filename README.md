@@ -2,7 +2,7 @@
 # APAcatcher
 ## Introduction
 
-Alternative polyadenylation (APA), a key post-transcriptional regulator affecting > 70% of human genes,
+**Alternative polyadenylation (APA)**, a key post-transcriptional regulator affecting > 70% of human genes,
 generates mRNA isoforms with distinct 3’ ends. Despite its widespread biological importance, APA detection remains
 challenging in full-length bulk and single-cell RNA-seq, especially for datasets derived from rare specimens.
 Here, we developed **APAcatcher**, a deep learning embedded approach integrating both **in vivo** cleavage patterns
