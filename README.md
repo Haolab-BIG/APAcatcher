@@ -27,7 +27,7 @@ pip install \
   einops==0.8.0 \
   tqdm==4.66.5
 ```
-> **Note:** The script has been tested with Python 3.8.18,bedtools(v2.31.0),salmon(v1.10.1).
+> **Note:** The script has been tested with Python 3.8.18, bedtools(v2.31.0), salmon(v1.10.1).
 
 ---
 ## Preparation: Bam to depth file
