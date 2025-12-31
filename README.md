@@ -54,10 +54,10 @@ Estimated Runtime per Stage (~30M reads, 8 kernel)
 
 | Stage                                | Typical Runtime*             |
 |--------------------------------------|------------------------------|
-| Generate input files                 | ~5 min                       |
-| Identify high-confidence APA sites   | ~12 min                      |
-| Quantify with Salmon                 | ~20-30 min                   |
-| Assemble the final data matrix       | ~5-10 min                    |
+| Generate input files                 | ~5 min per sample            |
+| Identify high-confidence APA sites   | 10-60 min per samlpe         |
+| Quantify with Salmon                 | ~10-20 min per samlpe        |
+| Assemble the final data matrix       | ~1-2 min                     |
 
 Runtime estimates vary depending on dataset size, sequencing depth, and available computing resources.
 
