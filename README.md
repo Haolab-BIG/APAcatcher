@@ -7,7 +7,15 @@ challenging in full-length bulk and single-cell RNA-seq, especially for datasets
 Here, we developed APAcatcher, a deep learning embedded approach integrating both in vivo cleavage patterns
 from sequencing data and in vitro DNA sequence features, achieving accurate and robust APA detection and quantification. 
 ```
+## Supported Species
 
+- **Arabidopsis**
+- **Caenorhabditis elegans (C.elegans)**
+- **Drosophila**
+- **Mouse**
+- **Yeast**
+- **Zebrafish**
+- **Human**
 ## System Requirements
 - Operating System: Linux / macOS 
 - Hardware: No non-standard hardware required (runs on a standard laptop/desktop)
