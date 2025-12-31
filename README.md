@@ -262,7 +262,7 @@ Options for `get_quant.sh`:
 | `-d` | Directory of input FASTQ files              |
 | `-o` | Output directory for quantification results |
 
-**Example:**
+**Example for paired-end:**
 
 ```bash
 ./get_quant.sh \
@@ -271,6 +271,13 @@ Options for `get_quant.sh`:
   -o quant_results
 ```
 
+**Example for single-end:**
+```bash
+  ./get_quant_single_end.sh \
+  -i 3UTRisoforms_library \
+  -d fastq_directory \
+  -o quant_results
+```
 ---
 
 #### 3.3 Merge Quantification Across Samples
