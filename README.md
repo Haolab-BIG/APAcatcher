@@ -148,7 +148,7 @@ Options for `cluster_bed_files.sh`:
 
 #### 2.3 Inter-group merging
 if you only have one group，pass this command
-
+Please run the script using absolute paths 
 Options for `combind.sh`:
 
 | Flag                | Description                    | Default |
