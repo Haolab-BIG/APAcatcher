@@ -52,7 +52,7 @@ pip install \
 APAcatcher using depth file as input
 
 **💡 Recommended Genome Annotations**
-To achieve the best results, we recommend using the following GTF versions to generate your 3′ UTR BED files for each species:
+To achieve the best results, we recommend using the following GTF versions to generate your BAM files for each species:
 
 | Species          | Recommended GTF File                         |
 |------------------|----------------------------------------------|
