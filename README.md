@@ -77,6 +77,7 @@ Estimated Runtime per Stage (~30M reads, 8 kernel)
 | Assemble the final data matrix       | ~1-2 min                     |
 
 Runtime estimates vary depending on dataset size, sequencing depth, and available computing resources.
+
 ---
 **Notes**
 ⚠️ Please run the script using absolute paths 
