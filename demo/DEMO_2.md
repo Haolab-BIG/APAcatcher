@@ -107,3 +107,14 @@ python get_final_result.py \
   --output_dir ./Sample_output/final_result \
   --length 100
 ```
+
+### 5. DE analysis
+```bash
+python DE_analysis.py \
+  -t /final_result/TPM.txt \
+  -i /final_result/3UTR_index.txt \
+  -a groupA.txt \
+  -b groupB.txt \
+  -m index \
+  -o KO_WT_index.txt
+```
