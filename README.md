@@ -407,7 +407,7 @@ All output files are tab-delimited.
 ⚠️ **Data Preprocessing Note**:
 
 In the generated .txt files, any original values recorded as **0** (which represent null or missing values)
-have been automatically converted to **NA**.This conversion is implemented to ensure data integrity
+have been automatically converted to **NA**(Display as empty in output files).This conversion is implemented to ensure data integrity
 and compatibility for subsequent statistical testing and differential expression analysis.
 
 
