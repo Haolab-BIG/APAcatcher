@@ -48,7 +48,24 @@ pip install \
 
 ---
 ## Preparation: Bam to depth file
+
 APAcatcher using depth file as input
+**💡 Recommended Genome Annotations**
+To achieve the best results, we recommend using the following GTF versions to generate your 3′ UTR BED files for each species:
+
+| Species          | Recommended GTF File                         |
+|------------------|----------------------------------------------|
+|Human             | gencode.v46.primary_assembly.annotation.gtf  |
+| Mouse            | mm10.ncbiRefSeq.gtf                          |
+| Zebrafish        | Danio_rerio.GRCz11.115.gtf                   |
+| Drosophila       | Drosophila_melanogaster.BDGP6.54.115.gtf     |
+| Arabidopsis      | Arabidopsis_thaliana.TAIR10.62.gtf           |
+| Yeast            | Saccharomyces_cerevisiae.R64-1-1.115.gtf     |
+| C. elegans       | Caenorhabditis_elegans.WBcel235.115.gtf      |
+
+
+
+
 ```
 # extract reads in 3’UTR regions
 samtools view -hb -L UTR_Human.bed sample1.bam > sample1_3UTR.bam
