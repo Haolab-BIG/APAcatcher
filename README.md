@@ -117,7 +117,8 @@ chr1    70011   0   OR4F5%%1    +
 #### 2.1 PAS detection with PELT + Deep Learning
 🚨 Runtime Warning
 PAS detection is the most time-consuming step in the pipeline.
-Depending on the average 3′ UTR length, processing each sample may require 10–60 minutes.
+Depending on the average 3′ UTR length, processing each sample may require 10–60 minutes.(In Human H1 cellline,40M reads)
+
 
 Options for `main.py`:
 
