@@ -1,3 +1,13 @@
+## Preparation: Download FASTQ Files
+
+Before generating BAM and depth files, raw sequencing data should be downloaded in FASTQ format.
+
+We provide a shell script (`download.sh`) containing all download commands. Please make sure the script has execution permission and run it as follows:
+
+```bash
+chmod +x download.sh
+./download.sh
+
 ## Preparation: Bam to Depth File
 
 ```bash
