@@ -90,7 +90,7 @@ Estimated Runtime per Stage (~30M reads, 8 kernel)
 | Stage                                | Typical Runtime*             |
 |--------------------------------------|------------------------------|
 | Generate input files                 | ~5 min per sample            |
-| Identify high-confidence APA sites   | 10-60 min per samlpe         |
+| Identify high-confidence APA sites   | ~10 min per samlpe         |
 | Quantify with Salmon                 | ~10-20 min per samlpe        |
 | Assemble the final data matrix       | ~1-2 min                     |
 
@@ -135,7 +135,7 @@ chr1    70011   0   OR4F5%%1    +
 #### 2.1 PAS detection with PELT + Deep Learning
 🚨 Runtime Warning
 PAS detection is the most time-consuming step in the pipeline.
-Depending on the average 3′ UTR length, processing each sample may require 10–60 minutes.(In Human H1 cellline,40M reads)
+Depending on the average 3′ UTR length, processing each sample may require 30 minutes.(In Human H1 cellline,40M reads,3 replicates)
 
 
 Options for `main.py`:
