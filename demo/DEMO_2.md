@@ -7,7 +7,7 @@ We provide a shell script (`download.sh`) containing all download commands. Plea
 ```bash
 chmod +x download.sh
 ./download.sh
-
+```
 ## Preparation: Bam to Depth File
 
 ```bash
