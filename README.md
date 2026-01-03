@@ -20,8 +20,36 @@ from sequencing data and **in vitro** DNA sequence features, achieving accurate 
 ## System Requirements
 - Operating System: Linux / macOS 
 - Hardware: No non-standard hardware required (runs on a standard laptop/desktop)
+---
 
-## Installation
+## Installation (Singularity Version)
+
+---
+
+## 1. Download APAcatcher Singularity Image
+
+Pull the pre-built image directly from the Singularity Library:
+
+```bash
+singularity pull --arch amd64 library://c10969/default/apacatcher:latest
+```
+## Notes on Running Commands
+
+All commands are identical to the Conda version **except**:
+
+- Each command must be prefixed with  
+  ```bash
+  singularity exec --bind <host_path> apacatcher.sif
+  ```
+- Always use **absolute paths**
+
+Example:
+```bash
+singularity exec --bind /data,/home apacatcher.sif python main.py --help
+```
+
+---
+## Installation (Conda version)
 Typical install time on a "normal" desktop computer: about 10 minutes
 
 We recommend creating a dedicated Conda environment:
