@@ -334,9 +334,8 @@ Options for `get_salmon_index.sh`:
 
 **Example:**
 
-
 #### Singularity version
-···
+```bash
 singularity exec --bind /path/to/data:/data apacatcher.sif \
   get_salmon_index.sh \
   -f /data/final_site.bed \
@@ -345,7 +344,7 @@ singularity exec --bind /path/to/data:/data apacatcher.sif \
   -g /data/hg38.fa \
   -o /data/3UTRisoforms.fa \
   -i /data/3UTRisoforms_library
-···
+```
 
 #### Conda version
 ```bash
