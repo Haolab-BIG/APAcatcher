@@ -231,7 +231,7 @@ Options for `cluster_bed_files.sh`:
 
 **Example:**
 #### Singularity version
-```
+```bash
 singularity exec --bind /path/to/data:/data apacatcher.sif \
   cluster_bed_files.sh \
   -i /data/high_confidence_pas_folder \
