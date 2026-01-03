@@ -43,7 +43,7 @@ All commands are identical to the Conda version **except**:
 
 Example:
 ```bash
-singularity exec --bind /path/to/data:/data apacatcher.sif python main.py --help
+singularity exec --bind /path/to/data:/data apacatcher.sif main.py --help
 ```
 
 ---
