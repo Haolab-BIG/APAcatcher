@@ -126,7 +126,7 @@ Estimated Runtime per Stage (~30M reads, 8 kernel)
 | Stage                                | Typical Runtime*             |
 |--------------------------------------|------------------------------|
 | Generate input files                 | ~5 min per sample            |
-| Identify high-confidence APA sites   | ~10 min per samlpe         |
+| Identify high-confidence APA sites   | ~10 min per samlpe           |
 | Quantify with Salmon                 | ~10-20 min per samlpe        |
 | Assemble the final data matrix       | ~1-2 min                     |
 
@@ -203,7 +203,7 @@ singularity exec --bind /path/to/data:/data apacatcher.sif \
   --genome_file /data/hg38.fa \
   --model_path /data/muti_species/APAcatcher.Human \
   --num_processes 8 \
-  --output_folder /data/high_confidence_pas_folder \
+  --output_folder /data/high_confidence_pas_folder
 ```
 
 #### Conda version
