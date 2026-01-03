@@ -37,13 +37,13 @@ All commands are identical to the Conda version **except**:
 
 - Each command must be prefixed with  
   ```bash
-  singularity exec --bind <host_path> apacatcher.sif
+  singularity exec --bind /path/to/data:/data apacatcher.sif
   ```
 - Always use **absolute paths**
 
 Example:
 ```bash
-singularity exec --bind /data,/home apacatcher.sif python main.py --help
+singularity exec --bind /path/to/data:/data apacatcher.sif python main.py --help
 ```
 
 ---
