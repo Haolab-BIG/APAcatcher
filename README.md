@@ -91,8 +91,18 @@ To achieve the best results, we recommend using the following GTF versions to ge
 | C. elegans       | Caenorhabditis_elegans.WBcel235.115.gtf      |
 
 
+### Singularity version
+```
+# extract reads in 3’UTR regions
+singularity exec --bind /path/to/data:/data apacatcher.sif \
+  samtools view -hb -L /data/UTR_Human.bed /data/sample1.bam > sample1_3UTR.bam
 
+# convert bam to depth.txt
+singularity exec --bind /path/to/data:/data apacatcher.sif \
+  samtools depth sample1_3UTR.bam -b /data/UTR_Human.bed > sample1_3UTR_read_coverage.txt
+```
 
+### Conda version
 ```
 # extract reads in 3’UTR regions
 samtools view -hb -L UTR_Human.bed sample1.bam > sample1_3UTR.bam
@@ -138,7 +148,13 @@ chr1    70011   0
 ```
 
 First, annotate each depth file with gene%%transcript_number and strand information (based on RefSeq_UTR_final.bed, please see the detailed information from the README.md in the “demo” file):
-
+#### Singularity version
+```
+singularity exec --bind /data apacatcher.sif add_geneinfo.py \
+-g /data/UTR_Human.bed \
+-d /data/input_depth_file_dir
+```
+#### Conda version
 ```bash
 python add_geneinfo.py \
   -g UTR_Human.bed \
@@ -179,7 +195,17 @@ Options for `main.py`:
 | `--model_path`        | Path to the pre-trained model for different species. The species (e.g., Human) is automatically inferred from the filename.         | `APAcatcher_Human.pth`     |
 
 **Example:**
+#### Singularity version
+```
+singularity exec --bind /path/to/data:/data apacatcher.sif \
+  main.py \
+  --input_folder /data/depth_file_dir \
+  --genome_file /data/hg38.fa \
+  --output_folder /data/high_confidence_pas_folder \
+  --num_processes 8
+```
 
+#### Conda version
 ```bash
 python main.py \
   --input_folder depth_file_dir \
@@ -201,7 +227,16 @@ Options for `cluster_bed_files.sh`:
 | `-c` | Minimum replicate count             | `2`     |
 
 **Example:**
+#### Singularity version
+```
+singularity exec --bind /path/to/data:/data apacatcher.sif \
+  cluster_bed_files.sh \
+  -i /data/high_confidence_pas_folder \
+  -o /data/cluster_high_confidence_pas_folder
+```
 
+
+#### Conda version
 ```bash
 ./cluster_bed_files.sh \
   -i high_confidence_pas_folder \
@@ -222,7 +257,15 @@ Options for `combind.sh`:
 | `-d MERGE_DISTANCE` | Merge distance (bp)            | `70`    |
 
 **Example:**
+#### Singularity version
+```
+singularity exec --bind /path/to/data:/data apacatcher.sif \
+  combind.sh \
+  -i /data/cluster_high_confidence_pas_folder \
+  -o /data/cluster_high_confidence_pas_folder/combind
+```
 
+#### Conda version
 ```bash
 ./combind.sh \
   -i cluster_high_confidence_pas_folder \
@@ -234,10 +277,21 @@ Options for `combind.sh`:
 #### 2.4 Remove annotated-proximal sites
 
 Options for `process_last.py`:
-| Flag                | Description                              | Default |
-| ------------------- | -----------------------------------------| ------- |
-| `--input`      | single group or mulitiple group BED file |         |
-| `--output`     | Output directory                         |         |
+| Flag                | Description                              |
+| ------------------- | -----------------------------------------|
+| `--input`      | single group or mulitiple group BED file |
+| `--output`     | Output directory                         |
+
+#### Singularity version
+```
+singularity exec --bind /path/to/data:/data apacatcher.sif \
+  process_last.py \
+  --input /data/<PAS_BED> \
+  --output /data/final_site_for_quantification.bed
+```
+
+
+#### Conda version
 ```bash
 python process_last.py \
   --input <PAS_BED> \
@@ -277,6 +331,9 @@ Options for `get_salmon_index.sh`:
 
 **Example:**
 
+
+#### Singularity version
+#### Conda version
 ```bash
 ./get_salmon_index.sh \
   -f final_site_for_quantification.bed \
