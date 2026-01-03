@@ -201,8 +201,9 @@ singularity exec --bind /path/to/data:/data apacatcher.sif \
   main.py \
   --input_folder /data/depth_file_dir \
   --genome_file /data/hg38.fa \
+  --model_path /data/muti_species/APAcatcher.Human \
+  --num_processes 8 \
   --output_folder /data/high_confidence_pas_folder \
-  --num_processes 8
 ```
 
 #### Conda version
@@ -210,6 +211,8 @@ singularity exec --bind /path/to/data:/data apacatcher.sif \
 python main.py \
   --input_folder depth_file_dir \
   --genome_file hg38.fa \
+  --model_path ./muti_species/APAcatcher.Human \
+  --num_processes 8 \
   --output_folder high_confidence_pas_folder
 ```
 
