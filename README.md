@@ -24,8 +24,6 @@ from sequencing data and **in vitro** DNA sequence features, achieving accurate 
 
 ## Installation (Singularity Version)
 
----
-
 ## 1. Download APAcatcher Singularity Image
 
 Pull the pre-built image directly from the Singularity Library:
