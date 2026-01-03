@@ -333,6 +333,17 @@ Options for `get_salmon_index.sh`:
 
 
 #### Singularity version
+···
+singularity exec --bind /path/to/data:/data apacatcher.sif \
+  get_salmon_index.sh \
+  -f /data/final_site.bed \
+  -r /data/UTR_Human.bed \
+  -l /data/UTR_lastExon_Human.bed \
+  -g /data/hg38.fa \
+  -o /data/3UTRisoforms.fa \
+  -i /data/3UTRisoforms_library
+···
+
 #### Conda version
 ```bash
 ./get_salmon_index.sh \
@@ -363,15 +374,34 @@ Options for `get_quant.sh`:
 | `-d` | Directory of input FASTQ files              |
 | `-o` | Output directory for quantification results |
 
-**Example for paired-end:**
 
+#### Singularity version
+**Example for paired-end:**
+```bash
+singularity exec --bind /path/to/data:/data apacatcher.sif \
+  get_quant.sh \
+  -i /data/3UTRisoforms_library \
+  -d /data/fastq_directory \
+  -o /data/quant_results
+```
+
+**Example for single-end:**
+```bash
+  singularity exec --bind /path/to/data:/data apacatcher.sif \
+  get_quant_single_end.sh \
+  -i /data/3UTRisoforms_library \
+  -d /data/fastq_directory \
+  -o /data/quant_results
+```
+
+#### Conda version
+**Example for paired-end:**
 ```bash
 ./get_quant.sh \
   -i 3UTRisoforms_library \
   -d fastq_directory \
   -o quant_results
 ```
-
 **Example for single-end:**
 ```bash
   ./get_quant_single_end.sh \
@@ -383,10 +413,18 @@ Options for `get_quant.sh`:
 
 #### 3.3 Merge Quantification Across Samples
 
-Options for `merge_quant.sh`:
-
+#### Singularity version
 ```bash
-merge_quant.sh \
+  singularity exec --bind /path/to/data:/data apacatcher.sif \
+  merge_quant.sh \
+  -l /data/3UTRisoforms_library \
+  -b /data/quant_results \
+  -o /data/merged_tpm.txt
+```
+
+#### Conda version
+```bash
+./merge_quant.sh \
   -l sample_list.txt \
   -b /path/to/quant_results \
   -o merged_tpm.txt
@@ -442,7 +480,18 @@ sample5
 ```
 
 **Example:**
+#### Singularity version
+```bash
+  singularity exec --bind /path/to/data:/data apacatcher.sif \
+  get_final_result.py \
+  --group_files /data/group_A.txt /data/group_B.txt \
+  --merge_file /data/merged_tpm.txt \
+  --output_dir /data/final_result \
+  --length 100
+```
 
+
+#### Conda version
 ```bash
 python get_final_result.py \
   --group_files group_A.txt group_B.txt \
@@ -506,6 +555,20 @@ Options for `DE_analysis.py`:
 | `-o` | Output file name                                       |
 
 **Example:**
+#### Singularity version
+```bash
+  singularity exec --bind /path/to/data:/data apacatcher.sif \
+  DE_analysis.py \
+  -t /data/final_result/TPM.txt \
+  -i /data/final_result/3UTR_index.txt \
+  -a /data/groupA.txt \
+  -b /data/groupB.txt \
+  -m index \
+  -o /data/KO_WT_index.txt
+```
+
+
+#### Conda version
 ```bash
 python DE_analysis.py \
   -t /final_result/TPM.txt \
