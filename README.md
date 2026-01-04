@@ -48,6 +48,7 @@ singularity exec --bind /path/to/data:/data apacatcher.sif main.py --help
 
 ---
 ## Installation (Conda Version)
+You can download Conda on https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html
 Typical install time on a "normal" desktop computer: about 10 minutes
 
 We recommend creating a dedicated Conda environment:
