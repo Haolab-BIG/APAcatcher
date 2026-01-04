@@ -155,8 +155,8 @@ First, annotate each depth file with gene%%transcript_number and strand informat
 #### Singularity version
 ```
 singularity exec --bind /path/to/data:/data apacatcher.sif add_geneinfo.py \
--g /data/UTR_Human.bed \
--d /data/input_depth_file_dir
+  -g /data/UTR_Human.bed \
+  -d /data/input_depth_file_dir
 ```
 #### Conda version
 ```bash
@@ -410,7 +410,7 @@ singularity exec --bind /path/to/data:/data apacatcher.sif \
 ```
 **Example for single-end:**
 ```bash
-  ./get_quant_single_end.sh \
+./get_quant_single_end.sh \
   -i 3UTRisoforms_library \
   -d fastq_directory \
   -o quant_results
@@ -488,7 +488,7 @@ sample5
 **Example:**
 #### Singularity version
 ```bash
-  singularity exec --bind /path/to/data:/data apacatcher.sif \
+singularity exec --bind /path/to/data:/data apacatcher.sif \
   get_final_result.py \
   --group_files /data/group_A.txt /data/group_B.txt \
   --merge_file /data/merged_tpm.txt \
@@ -563,7 +563,7 @@ Options for `DE_analysis.py`:
 **Example:**
 #### Singularity version
 ```bash
-  singularity exec --bind /path/to/data:/data apacatcher.sif \
+singularity exec --bind /path/to/data:/data apacatcher.sif \
   DE_analysis.py \
   -t /data/final_result/TPM.txt \
   -i /data/final_result/3UTR_index.txt \
