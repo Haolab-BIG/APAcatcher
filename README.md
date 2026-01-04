@@ -393,7 +393,7 @@ singularity exec --bind /path/to/data:/data apacatcher.sif \
 
 **Example for single-end:**
 ```bash
-  singularity exec --bind /path/to/data:/data apacatcher.sif \
+singularity exec --bind /path/to/data:/data apacatcher.sif \
   get_quant_single_end.sh \
   -i /data/3UTRisoforms_library \
   -d /data/fastq_directory \
@@ -421,9 +421,9 @@ singularity exec --bind /path/to/data:/data apacatcher.sif \
 
 #### Singularity version
 ```bash
-  singularity exec --bind /path/to/data:/data apacatcher.sif \
+singularity exec --bind /path/to/data:/data apacatcher.sif \
   merge_quant.sh \
-  -l /data/3UTRisoforms_library \
+  -l /data/sample_list.txt \
   -b /data/quant_results \
   -o /data/merged_tpm.txt
 ```
