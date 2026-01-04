@@ -43,19 +43,23 @@ extensions=("fastq.gz" "fq.gz" "fastq" "fq")
 
 # Process paired-end FASTQ files
 for ext in "${extensions[@]}"; do
-    for file1 in "$fastq_dir"/*_1*."$ext"; do
+    for file1 in "$fastq_dir"/*_1*."$ext" "$fastq_dir"/*_R1*."$ext"; do
         # Skip if file does not exist
         if [[ ! -e "$file1" ]]; then
             continue
         fi
 
-        # Extract sample name by removing _1 and extension
-        sample_name=$(basename "$file1")
-        sample_name="${sample_name%%_1*}"
-        echo "$sample_name"
-
+	fname=$(basename "$file1")
+	if [[ "$fname" == *"_R1"* ]]; then
+            sample_name="${fname%%_R1*}"
+            pair_pattern="_R2"
+        else
+            sample_name="${fname%%_1*}"
+            pair_pattern="_2"
+        fi
+	echo "Sample: $sample_name"
         # Find corresponding R2 file using wildcard match
-        file2=$(find "$fastq_dir" -maxdepth 1 -type f -name "${sample_name}_2*.$ext")
+        file2=$(find "$fastq_dir" -maxdepth 1 -type f -name "${sample_name}${pair_pattern}*.$ext")
         
         if [[ -z "$file2" ]]; then
             echo "$(date '+%Y-%m-%d %H:%M:%S') - Warning: Pair file for $file1 not found!"
