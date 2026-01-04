@@ -23,7 +23,7 @@ from sequencing data and **in vitro** DNA sequence features, achieving accurate 
 ---
 
 ## Installation (Singularity Version)
-
+You can download Singularity on https://docs.sylabs.io/guides/3.2/user-guide/installation.html
 ## 1. Download APAcatcher Singularity Image
 
 Pull the pre-built image directly from the Singularity Library:
