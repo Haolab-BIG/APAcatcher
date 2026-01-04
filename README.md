@@ -23,7 +23,8 @@ from sequencing data and **in vitro** DNA sequence features, achieving accurate 
 ---
 
 ## Installation (Singularity Version)
-You can download Singularity on https://docs.sylabs.io/guides/3.2/user-guide/installation.html
+You can downloadSingularity from:
+https://docs.sylabs.io/guides/3.2/user-guide/installation.html
 ## 1. Download APAcatcher Singularity Image
 
 Pull the pre-built image directly from the Singularity Library:
@@ -48,7 +49,8 @@ singularity exec --bind /path/to/data:/data apacatcher.sif main.py --help
 
 ---
 ## Installation (Conda Version)
-You can download Conda on https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html
+You can download Conda from:
+https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html
 
 Typical install time on a "normal" desktop computer: about 10 minutes
 
