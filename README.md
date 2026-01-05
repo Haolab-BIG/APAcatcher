@@ -21,6 +21,10 @@ from sequencing data and **in vitro** DNA sequence features, achieving accurate 
 - Operating System: Linux / macOS 
 - Hardware: No non-standard hardware required (runs on a standard laptop/desktop)
 ---
+##Tutorials and Videos
+
+We provide step-by-step video tutorials demonstrating each stage of the APAcatcher workflow.
+All videos are available in the video/ directory and cover detailed operations for data preparation, model execution, and result interpretation.
 
 ## Installation (Singularity Version)
 You can downloadSingularity from:
