@@ -25,7 +25,7 @@ from sequencing data and **in vitro** DNA sequence features, achieving accurate 
 ## Tutorials and Videos
 
 We provide step-by-step video tutorials demonstrating each stage of the APAcatcher workflow.
-All videos are available in the video/ directory and cover detailed operations for data preparation, model execution, and result interpretation.
+All videos are available in the video/ directory and cover detailed operations.
 
 ## Installation (Singularity Version)
 You can downloadSingularity from:
