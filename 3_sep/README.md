@@ -1,9 +1,6 @@
-# Optional Model for Internal Priming Filtering
-APAcatcher_3Sep.pth
-
-APAcatcher_3Sep.pth is an optional pretrained model specifically designed to reduce the impact of internal priming (IP) events in APA analysis.
-Internal priming, caused by oligo(dT) annealing to A-rich genomic regions rather than true poly(A) tails, can lead to false-positive polyadenylation site identification. 
+# Optional Model for 3'sep Data
+APAcatcher_3'seq.pth is an optional pretrained model specifically designed for 3'-seq data to address for internal priming (IP) filtration.
 # Usage Notes
 Usage Notes
-This model is optional and intended for datasets susceptible to internal priming artifacts.
+This model is available options for datasets susceptible to internal priming artifacts.
 
