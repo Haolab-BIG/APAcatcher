@@ -6,13 +6,13 @@ quantification and downstream APA analysis.
 
 ## Supported Species
 
-- *Arabidopsis*
-- *Caenorhabditis elegans (C.elegans)*
-- *Drosophila*
-- **Mouse**
-- **Yeast**
-- **Zebrafish**
 - **Human**
+- **Mouse**
+- **Zebrafish**
+- *Caenorhabditis elegans (C.elegans)*
+- **Yeast**
+- *Drosophila*
+- *Arabidopsis*
 ---
 
 ## Directory Structure
