@@ -95,10 +95,10 @@ To achieve the best results, we recommend using the following GTF versions to ge
 |Human             | gencode.v46.primary_assembly.annotation.gtf  |
 | Mouse            | mm10.ncbiRefSeq.gtf                          |
 | Zebrafish        | Danio_rerio.GRCz11.115.gtf                   |
-| Drosophila       | Drosophila_melanogaster.BDGP6.54.115.gtf     |
-| Arabidopsis      | Arabidopsis_thaliana.TAIR10.62.gtf           |
+| *Drosophila*       | Drosophila_melanogaster.BDGP6.54.115.gtf     |
+| *Arabidopsis*      | Arabidopsis_thaliana.TAIR10.62.gtf           |
 | Yeast            | Saccharomyces_cerevisiae.R64-1-1.115.gtf     |
-| C. elegans       | Caenorhabditis_elegans.WBcel235.115.gtf      |
+| *C.elegans*       | Caenorhabditis_elegans.WBcel235.115.gtf      |
 
 
 ### Singularity version
