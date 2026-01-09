@@ -8,11 +8,11 @@ quantification and downstream APA analysis.
 
 - **Human**
 - **Mouse**
-- **Zebrafish**
-- *Caenorhabditis elegans (C.elegans)*
-- **Yeast**
 - *Drosophila*
 - *Arabidopsis*
+- **Yeast**
+- **Zebrafish**
+- *Caenorhabditis elegans (C.elegans)*
 ---
 
 ## Directory Structure
