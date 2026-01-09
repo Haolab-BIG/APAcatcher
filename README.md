@@ -157,7 +157,7 @@ chr1    70011   0
 …
 ```
 
-First, annotate each depth file with gene%%transcript_number and strand information (based on RefSeq_UTR_final.bed, please see the detailed information from the README.md in the “demo” file):
+First, annotate each depth file with gene%%transcript_number and strand information (based on UTR_[species].bed, please see the detailed information from the README.md in the “demo” file):
 #### Singularity version
 ```
 singularity exec --bind /path/to/data:/data apacatcher.sif add_geneinfo.py \
