@@ -12,11 +12,11 @@ from sequencing data and **in vitro** DNA sequence features, achieving accurate 
 
 - **Human**
 - **Mouse**
-- **Drosophila**
-- **Arabidopsis**
+- *Drosophila*
+- *Arabidopsis*
 - **Yeast**
 - **Zebrafish**
-- **Caenorhabditis elegans (C.elegans)**
+- *Caenorhabditis elegans (C.elegans)*
 ## System Requirements
 - Operating System: Linux / macOS 
 - Hardware: No non-standard hardware required (runs on a standard laptop/desktop)
