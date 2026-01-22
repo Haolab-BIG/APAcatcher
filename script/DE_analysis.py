@@ -201,7 +201,6 @@ def chi_square_test(group, A_col, B_col):
     Perform Chi-square test between two categorical variables.
     Note: This function assumes A_col and B_col are categorical counts.
     """
-    # 如果 group 只有一行数据，跳过卡方检验
     if group.shape[0] == 1:
         return pd.Series({"chi2_p_value": 1.0})
 
