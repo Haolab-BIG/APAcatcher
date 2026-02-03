@@ -79,7 +79,7 @@ def add_group_TPM_sum_column(df, group_samples, group_name):
     """Calculate and add the group's TPM sum column."""
     # Find columns that match the group's samples and end with '_TPM'
     selected_columns = [col for col in df.columns if
-                        any(sample in col for sample in group_samples) and col.endswith('_TPM')]
+                        any(col.endswith(f"{sample}_TPM") for sample in group_samples)]
     if not selected_columns:
         logging.warning(f"No matching TPM columns found for group '{group_name}'.")
         df[f"{group_name}_TPM_sum"] = 0
@@ -92,7 +92,7 @@ def add_group_TPM_mean_column(df, group_samples, group_name):
     """Calculate and add the group's TPM  mean column."""
     # Find columns that match the group's samples and end with 'TPM'
     selected_columns = [col for col in df.columns if
-                        any(sample in col for sample in group_samples) and col.endswith('_TPM')]
+                        any(col.endswith(f"{sample}_TPM") for sample in group_samples)]
     if not selected_columns:
         logging.warning(f"No matching TPM columns found for group '{group_name}'.")
         df[f"{group_name}_TPM_mean"] = 0
@@ -105,7 +105,7 @@ def add_group_index_mean_column(df, group_samples, group_name):
     """Calculate and add the group's Index UTR mean column."""
     # Find columns that match the group's samples and end with '_indexUTR'
     selected_columns = [col for col in df.columns if
-                        any(sample in col for sample in group_samples) and col.endswith('_indexUTR')]
+                        any(col.endswith(f"{sample}_indexUTR") for sample in group_samples)]
     if not selected_columns:
         logging.warning(f"No matching Index UTR columns found for group '{group_name}'.")
         df[f"{group_name}_indexUTR_mean"] = 0
@@ -118,7 +118,7 @@ def add_group_pdui_mean_column(df, group_samples, group_name):
     """Calculate and add the group's PDUI UTR mean column."""
     # Find columns that match the group's samples and end with '_PDUI'
     selected_columns = [col for col in df.columns if
-                        any(sample in col for sample in group_samples) and col.endswith('_PDUI')]
+                        any(col.endswith(f"{sample}_PDUI") for sample in group_samples)]
     if not selected_columns:
         logging.warning(f"No matching Index UTR columns found for group '{group_name}'.")
         df[f"{group_name}_PDUI_mean"] = 0
