@@ -38,7 +38,6 @@ def filter_groups_based_on_max_length(group, length):
     """Filter groups by maximum transcript length"""
     grouped = group.groupby('Transcript')
     print(length)
-    # Iterate through each group
     for group_name, group_data in grouped:
         max_length = group_data['Length'].max()
         if max_length < length:
@@ -86,7 +85,7 @@ def process_transcript_column(df, column_name):
 
 
 def calculate_usage(group):
-    """Calculate usage for each sample"""
+    """Calculate usage for each sample based on TPM; NumReads columns are carried through unchanged"""
     tpm_columns = [col for col in group.columns if col.endswith('_TPM')]
     usage_columns = [col.replace('_TPM', '_usage') for col in tpm_columns]
 
@@ -110,7 +109,7 @@ def calculate_other(group):
     index_UTR_columns = [col.replace('_usage', '_indexUTR') for col in usage_columns]
     PDUI_columns = [col.replace('_usage', '_PDUI') for col in usage_columns]
     PPUI_columns = [col.replace('_usage', '_PPUI') for col in usage_columns]
-    # Dictionary to store calculation results
+
     results = {}
 
     if len(group) == 1:
@@ -120,19 +119,18 @@ def calculate_other(group):
             results[p_col] = 1.0
             results[pp_col] = 0.0
     else:
-        # Calculate when multiple rows exist in group
         for u_col, l_col, i_col, p_col, pp_col in zip(usage_columns, average_UTRlength_columns, index_UTR_columns,
                                                       PDUI_columns, PPUI_columns):
             sum_result = (group[u_col] * group["Length"]).sum()
             results[l_col] = [sum_result] * len(group)
             results[i_col] = [sum_result / group["Length"].max()] * len(group)
-            # Find index of max/min length and get corresponding usage value
             max_length_index = group['Length'].idxmax()
             min_length_index = group["Length"].idxmin()
             p_result = group.loc[max_length_index, u_col]
             pp_result = group.loc[min_length_index, u_col]
             results[p_col] = [p_result] * len(group)
             results[pp_col] = [pp_result] * len(group)
+
     results_df = pd.DataFrame(results, index=group.index)
     group = pd.concat([group, results_df], axis=1)
     return group
@@ -142,31 +140,46 @@ def get_csv(df, output_dir):
     """Process and export various CSV files"""
     base_col = ["Name", "Length", 'Transcript', 'start', 'end', 'strand']
 
-    usage_col = base_col + [col for col in df.columns if col.endswith('_usage')]
-    tpm_col = base_col + [col for col in df.columns if col.endswith('_TPM')]
+    usage_col         = base_col + [col for col in df.columns if col.endswith('_usage')]
+    tpm_col           = base_col + [col for col in df.columns if col.endswith('_TPM')]
+    # ── NEW: collect NumReads columns ──────────────────────────────────────────
+    numreads_col      = base_col + [col for col in df.columns if col.endswith('_NumReads')]
+    # ──────────────────────────────────────────────────────────────────────────
     averageLength_col = base_col + [col for col in df.columns if col.endswith('_averageLength')]
-    PDUI_col = base_col + [col for col in df.columns if col.endswith('_PDUI')]
-    index_col = base_col + [col for col in df.columns if col.endswith('_indexUTR')]
-    PPUI_col = base_col + [col for col in df.columns if col.endswith('_PPUI')]
+    PDUI_col          = base_col + [col for col in df.columns if col.endswith('_PDUI')]
+    index_col         = base_col + [col for col in df.columns if col.endswith('_indexUTR')]
+    PPUI_col          = base_col + [col for col in df.columns if col.endswith('_PPUI')]
+
     os.makedirs(output_dir, exist_ok=True)
 
-    df_usage = df[usage_col]
-    df_tpm = df[tpm_col]
+    df_usage        = df[usage_col]
+    df_tpm          = df[tpm_col]
+    # ── NEW: build NumReads dataframe ──────────────────────────────────────────
+    df_numreads     = df[numreads_col] if numreads_col != base_col else None
+    # ──────────────────────────────────────────────────────────────────────────
     df_averageLength = process_transcript_column(df[averageLength_col], 'Transcript')
-    df_PDUi = process_transcript_column(df[PDUI_col], 'Transcript')
-    df_PPUI = process_transcript_column(df[PPUI_col], "Transcript")
-    df_indexUTR = process_transcript_column(df[index_col], 'Transcript')
+    df_PDUi          = process_transcript_column(df[PDUI_col], 'Transcript')
+    df_PPUI          = process_transcript_column(df[PPUI_col], "Transcript")
+    df_indexUTR      = process_transcript_column(df[index_col], 'Transcript')
 
     df_indexUTR = df_indexUTR.replace(0, np.nan)
-    df_PDUi = df_PDUi.replace(0, np.nan)
-    df_PPUI = df_PPUI.replace(0, np.nan)
+    df_PDUi     = df_PDUi.replace(0, np.nan)
+    df_PPUI     = df_PPUI.replace(0, np.nan)
 
-    df_usage.to_csv(os.path.join(output_dir, "3UTR_usage.txt"), sep="\t", index=False)
-    df_tpm.to_csv(os.path.join(output_dir, "TPM.txt"), sep="\t", index=False)
+    df_usage.to_csv(os.path.join(output_dir, "3UTR_usage.txt"),          sep="\t", index=False)
+    df_tpm.to_csv(os.path.join(output_dir, "TPM.txt"),                   sep="\t", index=False)
     df_averageLength.to_csv(os.path.join(output_dir, "3UTR_averageLength.txt"), sep="\t", index=False)
-    df_PDUi.to_csv(os.path.join(output_dir, "PDUI.txt"), sep="\t", index=False)
-    df_indexUTR.to_csv(os.path.join(output_dir, "3UTR_index.txt"), sep="\t", index=False)
-    df_PPUI.to_csv(os.path.join(output_dir, "PPUI.txt"), sep="\t", index=False)
+    df_PDUi.to_csv(os.path.join(output_dir, "PDUI.txt"),                 sep="\t", index=False)
+    df_indexUTR.to_csv(os.path.join(output_dir, "3UTR_index.txt"),       sep="\t", index=False)
+    df_PPUI.to_csv(os.path.join(output_dir, "PPUI.txt"),                 sep="\t", index=False)
+
+    if df_numreads is not None:
+        df_numreads.to_csv(os.path.join(output_dir, "NumReads.txt"),     sep="\t", index=False)
+        logging.info("NumReads.txt saved")
+    else:
+        logging.warning("No _NumReads columns found in data; NumReads.txt not written")
+    # ──────────────────────────────────────────────────────────────────────────
+
     logging.info(f"All CSV files saved to {output_dir}")
 
 
@@ -184,18 +197,21 @@ def main():
     except Exception as e:
         logging.error(f"Failed to load merged file {args.merge_file}: {e}")
         sys.exit(1)
+
     data_raw['tmp'] = data_raw['Name'].str.replace("::", ":")
     data_split = data_raw['tmp'].str.split(':', expand=True)
     data_split.columns = ['Transcript', 'strand', 'chr', 'position']
     data_split[['start', 'end']] = data_split['position'].str.split('-', expand=True)
     data_raw = pd.concat([data_raw, data_split[['Transcript', 'strand', 'chr', 'start', 'end']]], axis=1)
     logging.info("Completed splitting and extracting information from Name column")
+
     if args.length > 0:
         data_raw = filter_groups_based_on_max_length(data_raw, args.length)
         print(data_raw.shape[0])
         data_raw = data_raw.reset_index(drop=True)
     else:
         data_raw = data_raw.reset_index(drop=True)
+
     # Load all sample groups
     groups = {}
     for group_file in args.group_files:
@@ -205,18 +221,16 @@ def main():
             sys.exit(1)
         groups[group_name] = load_group_samples(group_file)
 
-    # Calculate and add TPM mean columns for each group
+    # Calculate TPM means for filtering (NumReads not used for filtering)
     for group_name, samples in groups.items():
         add_group_TPM_mean_column(data_raw, samples, group_name)
 
-    # Build filter condition: all group TPM means are less than 5
+    # Filter: keep rows where at least one group has TPM mean >= 5
     filter_condition = " & ".join([f"(data_raw['{group_name}_TPM_mean'] < 5)" for group_name in groups.keys()])
     df_filtered = data_raw[~eval(filter_condition)].reset_index(drop=True)
     logging.info(f"Filtered data row count: {df_filtered.shape[0]}")
 
-    # Split Name column and extract transcript information
-
-    # Group by Transcript and calculate usage
+    # Group by Transcript and calculate usage (TPM-based; NumReads carried through)
     grouped = df_filtered.groupby('Transcript')
     df_usage = grouped.apply(calculate_usage).reset_index(drop=True)
     logging.info("Completed usage calculation")
@@ -242,7 +256,7 @@ def main():
     final_result = grouped_final.apply(calculate_other).reset_index(drop=True)
     logging.info("Completed additional metric calculations")
 
-    # Export CSV files
+    # Export CSV files (including NumReads.txt)
     get_csv(final_result, args.output_dir)
 
     logging.info("Script execution completed")
