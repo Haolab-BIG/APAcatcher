@@ -131,7 +131,7 @@ merge_samples() {
         sample=$(echo "$sample" | tr -d '\r\n')
         local sample_dir="${BASE_DIR}/${sample}"
         local quant_file="${sample_dir}/quant.sf"
-        local tmp_column="${sample}_tpm.txt"
+        local tmp_column="${sample}_counts.txt"
 
         [[ -d "$sample_dir" ]] || {
             log WARNING "Sample directory missing: $sample_dir"
@@ -145,11 +145,11 @@ merge_samples() {
 
         log INFO "Processing sample: $sample"
         
-        # Extract TPM column with header
-        awk -v col="${sample}_TPM" '
+        # Extract both TPM (col4) and NumReads (col5) columns with headers
+        awk -v tpm_col="${sample}_TPM" -v reads_col="${sample}_NumReads" '
             BEGIN {FS=OFS="\t"} 
-            NR == 1 {print col} 
-            NR > 1 {print $4}
+            NR == 1 {print tpm_col, reads_col} 
+            NR > 1  {print $4, $5}
         ' "$quant_file" > "$tmp_column"
         
         # Validate column dimensions
@@ -174,7 +174,7 @@ main() {
     parse_arguments "$@"
     validate_inputs
     
-    log INFO "Starting TPM matrix merge"
+    log INFO "Starting TPM + NumReads matrix merge"
     log INFO "System Configuration:"
     log INFO "  Sample List: $SAMPLE_LIST"
     log INFO "  Base Directory: $BASE_DIR"
@@ -188,3 +188,4 @@ main() {
 }
 
 main "$@"
+
