@@ -142,9 +142,7 @@ def get_csv(df, output_dir):
 
     usage_col         = base_col + [col for col in df.columns if col.endswith('_usage')]
     tpm_col           = base_col + [col for col in df.columns if col.endswith('_TPM')]
-    # ── NEW: collect NumReads columns ──────────────────────────────────────────
     numreads_col      = base_col + [col for col in df.columns if col.endswith('_NumReads')]
-    # ──────────────────────────────────────────────────────────────────────────
     averageLength_col = base_col + [col for col in df.columns if col.endswith('_averageLength')]
     PDUI_col          = base_col + [col for col in df.columns if col.endswith('_PDUI')]
     index_col         = base_col + [col for col in df.columns if col.endswith('_indexUTR')]
@@ -154,9 +152,7 @@ def get_csv(df, output_dir):
 
     df_usage        = df[usage_col]
     df_tpm          = df[tpm_col]
-    # ── NEW: build NumReads dataframe ──────────────────────────────────────────
     df_numreads     = df[numreads_col] if numreads_col != base_col else None
-    # ──────────────────────────────────────────────────────────────────────────
     df_averageLength = process_transcript_column(df[averageLength_col], 'Transcript')
     df_PDUi          = process_transcript_column(df[PDUI_col], 'Transcript')
     df_PPUI          = process_transcript_column(df[PPUI_col], "Transcript")
