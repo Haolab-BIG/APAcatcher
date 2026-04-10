@@ -1,4 +1,3 @@
-#Author: [ChengPeng]
 import os
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
