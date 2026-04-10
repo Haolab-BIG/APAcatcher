@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # ====================================================
-# Author: [ChengPeng]
 # Script Name : combine.sh
 # Description : Iterate through all BED files in a specified directory,
 #               merge, sort, process intervals, and output final_site.bed
