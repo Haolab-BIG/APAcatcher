@@ -1,6 +1,4 @@
-"""
-Author: [ChengPeng]
-"""
+
 import argparse
 from multiprocessing import Pool, TimeoutError
 from tqdm import tqdm
