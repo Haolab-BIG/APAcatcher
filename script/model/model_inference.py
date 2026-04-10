@@ -1,4 +1,3 @@
-# Author: [ChengPeng]
 import torch
 import pandas as pd
 from torch.utils.data import DataLoader, TensorDataset
