@@ -1,4 +1,3 @@
-# Author: [ChengPeng]
 import logging
 import pandas as pd
 from Bio import SeqIO
