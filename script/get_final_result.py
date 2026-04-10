@@ -1,4 +1,3 @@
-#Author: [ChengPeng]
 import argparse
 import pandas as pd
 import numpy as np
