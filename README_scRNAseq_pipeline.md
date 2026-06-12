@@ -158,4 +158,6 @@ Columns: `chromosome`, `position`, `depth`, `cell_id`, `strand`
 > **Note**: strand information should be added based on the UTR annotation.
 
 ---
----
+> Subsequent steps (strand annotation, depth file formatting, and APA analysis)
+> follow the same procedure as the bulk RNA-seq pipeline. Please refer to the
+> bulk RNA-seq [README](../README.md) for details.
