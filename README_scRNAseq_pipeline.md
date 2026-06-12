@@ -1,5 +1,6 @@
 
 # scRNA-seq Pipeline: FASTQ to Depth Files
+-
 This pipeline processes SMART-seq data (with UMI) from raw FASTQ files to
 per-cell 3′ UTR depth files suitable for APA analysis with APAcatcher.
 For SMART-seq data without UMI (e.g., SMART-seq2), the processing steps are
