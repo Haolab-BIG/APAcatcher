@@ -25,6 +25,8 @@ def parse_arguments():
     parser.add_argument('--merge_file', required=True, help='Path to merged data file')
     parser.add_argument('--output_dir', default='output', help='Directory to save output CSV files')
     parser.add_argument("--length", default=-1, type=int, help="Filter by minimum length")
+    parser.add_argument('--bed_no_lastexon', default=None,
+                        help='BED file without lastexon; used to correct Length by removing lastexon portion')
     return parser.parse_args()
 
 
@@ -84,7 +86,7 @@ def process_transcript_column(df, column_name):
 
 
 def calculate_usage(group):
-    """Calculate usage for each sample based on TPM; NumReads columns are carried through unchanged"""
+    """Calculate usage for each sample"""
     tpm_columns = [col for col in group.columns if col.endswith('_TPM')]
     usage_columns = [col.replace('_TPM', '_usage') for col in tpm_columns]
 
@@ -108,7 +110,6 @@ def calculate_other(group):
     index_UTR_columns = [col.replace('_usage', '_indexUTR') for col in usage_columns]
     PDUI_columns = [col.replace('_usage', '_PDUI') for col in usage_columns]
     PPUI_columns = [col.replace('_usage', '_PPUI') for col in usage_columns]
-
     results = {}
 
     if len(group) == 1:
@@ -129,63 +130,153 @@ def calculate_other(group):
             pp_result = group.loc[min_length_index, u_col]
             results[p_col] = [p_result] * len(group)
             results[pp_col] = [pp_result] * len(group)
-
     results_df = pd.DataFrame(results, index=group.index)
     group = pd.concat([group, results_df], axis=1)
     return group
 
 
+def calculate_cpm(df):
+    """
+    Calculate CPM for each sample.
+    Columns ending with '_TPM' are actually NumReads.
+    Adds corresponding '_CPM' columns.
+    """
+    read_cols = [col for col in df.columns if col.endswith('_TPM')]
+    for col in read_cols:
+        total_reads = df[col].sum()
+        cpm_col = col.replace('_TPM', '_CPM')
+        if total_reads > 0:
+            df[cpm_col] = df[col] / total_reads * 1e6
+        else:
+            df[cpm_col] = 0.0
+        logging.info(f"  {col}: total reads = {total_reads:.0f}, CPM calculated → {cpm_col}")
+    return df
+
+
+def load_bed_no_lastexon(bed_path):
+    bed_dict = {}
+    with open(bed_path) as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            parts = line.split('\t')
+            chrom, start, end, name, score, strand = (
+                parts[0], int(parts[1]), int(parts[2]), parts[3], parts[4], parts[5]
+            )
+            key = (name, strand)
+            if key not in bed_dict:
+                bed_dict[key] = []
+            bed_dict[key].append({'chrom': chrom, 'start': start, 'end': end})
+    logging.info(f"Loaded BED (no lastexon): {len(bed_dict)} transcript-strand entries from {bed_path}")
+    return bed_dict
+
+
+def fix_length_remove_lastexon(df, bed_dict):
+    """
+    For each row, correct the Length by removing the lastexon portion using the
+    no-lastexon BED file:
+      - Positive strand (+): replace start with BED start (lastexon is upstream/left)
+      - Negative strand (-): replace end with BED end (lastexon is upstream/right)
+    Length is recalculated as new_end - new_start.
+    The 'start' and 'end' columns in df are also updated accordingly.
+    Rows with no BED match are kept unchanged (with a warning).
+    """
+    fixed = 0
+    not_found = set()
+
+    for idx, row in df.iterrows():
+        transcript = row['Transcript']
+        strand = row['strand']
+        orig_start = int(row['start'])
+        orig_end = int(row['end'])
+
+        key = (transcript, strand)
+        if key not in bed_dict:
+            not_found.add(transcript)
+            continue
+
+        # Pick the matching BED entry (by coordinate overlap if multiple)
+        candidates = bed_dict[key]
+        entry = None
+        if len(candidates) == 1:
+            entry = candidates[0]
+        else:
+            for c in candidates:
+                if c['start'] <= orig_end and c['end'] >= orig_start:
+                    entry = c
+                    break
+        if entry is None:
+            not_found.add(transcript)
+            continue
+
+        if strand == '+':
+            new_start = entry['start']
+            new_end = orig_end
+        else:  # '-'
+            new_start = orig_start
+            new_end = entry['end']
+
+        new_length = new_end - new_start
+        if new_length <= 0:
+            logging.warning(
+                f"Non-positive length after lastexon removal for {transcript} "
+                f"({strand}): {new_start}-{new_end}, keeping original"
+            )
+            continue
+
+        df.at[idx, 'start'] = str(new_start)
+        df.at[idx, 'end'] = str(new_end)
+        df.at[idx, 'Length'] = new_length
+        fixed += 1
+
+    if not_found:
+        logging.warning(
+            f"No BED match for {len(not_found)} transcript(s), keeping original lengths. "
+            f"Examples: {list(not_found)[:5]}"
+        )
+    logging.info(f"Lastexon length correction: {fixed} / {len(df)} rows updated")
+    return df
+
+
 def get_csv(df, output_dir):
-    """Process and export various CSV files"""
     base_col = ["Name", "Length", 'Transcript', 'start', 'end', 'strand']
 
-    usage_col         = base_col + [col for col in df.columns if col.endswith('_usage')]
-    tpm_col           = base_col + [col for col in df.columns if col.endswith('_TPM')]
-    numreads_col      = base_col + [col for col in df.columns if col.endswith('_NumReads')]
+    usage_col = base_col + [col for col in df.columns if col.endswith('_usage')]
+    tpm_col = base_col + [col for col in df.columns if col.endswith('_TPM')]
     averageLength_col = base_col + [col for col in df.columns if col.endswith('_averageLength')]
-    PDUI_col          = base_col + [col for col in df.columns if col.endswith('_PDUI')]
-    index_col         = base_col + [col for col in df.columns if col.endswith('_indexUTR')]
-    PPUI_col          = base_col + [col for col in df.columns if col.endswith('_PPUI')]
-
+    PDUI_col = base_col + [col for col in df.columns if col.endswith('_PDUI')]
+    index_col = base_col + [col for col in df.columns if col.endswith('_indexUTR')]
+    PPUI_col = base_col + [col for col in df.columns if col.endswith('_PPUI')]
     os.makedirs(output_dir, exist_ok=True)
 
-    df_usage        = df[usage_col]
-    df_tpm          = df[tpm_col]
-    df_numreads     = df[numreads_col] if numreads_col != base_col else None
+    df_usage = df[usage_col]
+    df_tpm = df[tpm_col]
     df_averageLength = process_transcript_column(df[averageLength_col], 'Transcript')
-    df_PDUi          = process_transcript_column(df[PDUI_col], 'Transcript')
-    df_PPUI          = process_transcript_column(df[PPUI_col], "Transcript")
-    df_indexUTR      = process_transcript_column(df[index_col], 'Transcript')
+    df_PDUi = process_transcript_column(df[PDUI_col], 'Transcript')
+    df_PPUI = process_transcript_column(df[PPUI_col], "Transcript")
+    df_indexUTR = process_transcript_column(df[index_col], 'Transcript')
 
     df_indexUTR = df_indexUTR.replace(0, np.nan)
-    df_PDUi     = df_PDUi.replace(0, np.nan)
-    df_PPUI     = df_PPUI.replace(0, np.nan)
+    df_PDUi = df_PDUi.replace(0, np.nan)
+    df_PPUI = df_PPUI.replace(0, np.nan)
 
-    df_usage.to_csv(os.path.join(output_dir, "3UTR_usage.txt"),          sep="\t", index=False)
-    df_tpm.to_csv(os.path.join(output_dir, "TPM.txt"),                   sep="\t", index=False)
+    df_usage.to_csv(os.path.join(output_dir, "3UTR_usage.txt"), sep="\t", index=False)
+    df_tpm.to_csv(os.path.join(output_dir, "TPM.txt"), sep="\t", index=False)
     df_averageLength.to_csv(os.path.join(output_dir, "3UTR_averageLength.txt"), sep="\t", index=False)
-    df_PDUi.to_csv(os.path.join(output_dir, "PDUI.txt"),                 sep="\t", index=False)
-    df_indexUTR.to_csv(os.path.join(output_dir, "3UTR_index.txt"),       sep="\t", index=False)
-    df_PPUI.to_csv(os.path.join(output_dir, "PPUI.txt"),                 sep="\t", index=False)
-
-    if df_numreads is not None:
-        df_numreads.to_csv(os.path.join(output_dir, "NumReads.txt"),     sep="\t", index=False)
-        logging.info("NumReads.txt saved")
-    else:
-        logging.warning("No _NumReads columns found in data; NumReads.txt not written")
-    # ──────────────────────────────────────────────────────────────────────────
-
+    df_PDUi.to_csv(os.path.join(output_dir, "PDUI.txt"), sep="\t", index=False)
+    df_indexUTR.to_csv(os.path.join(output_dir, "3UTR_index.txt"), sep="\t", index=False)
+    df_PPUI.to_csv(os.path.join(output_dir, "PPUI.txt"), sep="\t", index=False)
     logging.info(f"All CSV files saved to {output_dir}")
 
 
 def main():
-    """Main function"""
     setup_logging()
     args = parse_arguments()
 
     logging.info("Script execution started")
 
-    # Load data
+
     try:
         data_raw = pd.read_csv(args.merge_file, sep='\t')
         logging.info(f"Successfully loaded merged file: {args.merge_file}, rows: {data_raw.shape[0]}, columns: {data_raw.shape[1]}")
@@ -193,12 +284,21 @@ def main():
         logging.error(f"Failed to load merged file {args.merge_file}: {e}")
         sys.exit(1)
 
+
     data_raw['tmp'] = data_raw['Name'].str.replace("::", ":")
     data_split = data_raw['tmp'].str.split(':', expand=True)
     data_split.columns = ['Transcript', 'strand', 'chr', 'position']
     data_split[['start', 'end']] = data_split['position'].str.split('-', expand=True)
     data_raw = pd.concat([data_raw, data_split[['Transcript', 'strand', 'chr', 'start', 'end']]], axis=1)
+    data_raw = data_raw.drop(columns=['tmp'])
     logging.info("Completed splitting and extracting information from Name column")
+
+    if args.bed_no_lastexon:
+        bed_dict = load_bed_no_lastexon(args.bed_no_lastexon)
+        data_raw = fix_length_remove_lastexon(data_raw, bed_dict)
+    else:
+        logging.info("--bed_no_lastexon not provided, skipping lastexon length correction")
+
 
     if args.length > 0:
         data_raw = filter_groups_based_on_max_length(data_raw, args.length)
@@ -207,7 +307,6 @@ def main():
     else:
         data_raw = data_raw.reset_index(drop=True)
 
-    # Load all sample groups
     groups = {}
     for group_file in args.group_files:
         group_name = extract_group_name(group_file)
@@ -216,21 +315,21 @@ def main():
             sys.exit(1)
         groups[group_name] = load_group_samples(group_file)
 
-    # Calculate TPM means for filtering (NumReads not used for filtering)
-    for group_name, samples in groups.items():
-        add_group_TPM_mean_column(data_raw, samples, group_name)
+    data_raw = calculate_cpm(data_raw)
 
-    # Filter: keep rows where at least one group has TPM mean >= 5
-    filter_condition = " & ".join([f"(data_raw['{group_name}_TPM_mean'] < 5)" for group_name in groups.keys()])
-    df_filtered = data_raw[~eval(filter_condition)].reset_index(drop=True)
+    cpm_cols = [col for col in data_raw.columns if col.endswith('_CPM')]
+    low_cpm_mask = data_raw[cpm_cols].mean(axis=1) < 1 
+    df_filtered = data_raw[~low_cpm_mask].reset_index(drop=True)
     logging.info(f"Filtered data row count: {df_filtered.shape[0]}")
+    logging.info(f"Removed {low_cpm_mask.sum()} rows where mean CPM across all samples CPM < 1")
 
-    # Group by Transcript and calculate usage (TPM-based; NumReads carried through)
-    grouped = df_filtered.groupby('Transcript')
+    transcript_order = df_filtered['Transcript'].copy()
+    grouped = df_filtered.groupby('Transcript', group_keys=False)
     df_usage = grouped.apply(calculate_usage).reset_index(drop=True)
+    if 'Transcript' not in df_usage.columns:
+        df_usage.insert(df_usage.columns.get_loc('strand'), 'Transcript', transcript_order.values)
     logging.info("Completed usage calculation")
 
-    # Calculate group usage means
     for group_name, samples in groups.items():
         add_group_usage_mean_column(df_usage, samples, group_name)
 
@@ -246,12 +345,13 @@ def main():
         logging.error(f"Failed to convert Length column: {e}")
         sys.exit(1)
 
-    # Calculate additional metrics
-    grouped_final = df_usage_filtered.groupby('Transcript')
+    transcript_order_final = df_usage_filtered['Transcript'].copy()
+    grouped_final = df_usage_filtered.groupby('Transcript', group_keys=False)
     final_result = grouped_final.apply(calculate_other).reset_index(drop=True)
+    if 'Transcript' not in final_result.columns:
+        final_result.insert(final_result.columns.get_loc('strand'), 'Transcript', transcript_order_final.values)
     logging.info("Completed additional metric calculations")
 
-    # Export CSV files (including NumReads.txt)
     get_csv(final_result, args.output_dir)
 
     logging.info("Script execution completed")
