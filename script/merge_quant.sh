@@ -99,14 +99,13 @@ validate_inputs() {
     [[ -d "$BASE_DIR" ]] || { echo "Error: Base directory not found: $BASE_DIR" >&2; exit 1; }
 }
 
-# Logging system
+
 log() {
     local level=$1
     local message=$2
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] [${level^^}] $message" >&2
 }
 
-# Core processing functions
 initialize_matrix() {
     local first_sample=$(head -n 1 "$SAMPLE_LIST" | tr -d '\r\n')
     local first_quant="${BASE_DIR}/${first_sample}/quant.sf"
